@@ -26,13 +26,25 @@ def load_file(files):
 #för att läsa och räkna grundstatistik
 def basic_statistics(filename):
     total_words = 0
+    amound_char = 0
+    lines = 0
     file = open(filename, 'r', encoding="utf-8")
     for line in file:
         total_words += words(line)
+        amound_char += chars(line)
+        lines += 1
 
-    return "no", total_words, "no"
+    return lines, total_words, amound_char
 
+def chars(line):
+    count = 0
+    line = line.replace(" ", "")
+    print(line)
+    for ch in line:
+        count += 1
+    return count
 
+        
 def words(line):
     return len(line.split())
 
