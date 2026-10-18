@@ -41,7 +41,6 @@ def basic_statistics(filename):
 def chars(line):
     count = 0
     line = line.rstrip("\n").replace(" ", "")
-    print(line)
     for ch in line:
         count += 1
     return count
@@ -50,12 +49,17 @@ def chars(line):
 def words(line):
     return len(line.split())
 
-def save_result(results, filename, lines,words,chars):
+def save_result(results, filename, lines,words,chars, avg_wpl, avg_cpw):
     for saved in results:
         if saved[1] == filename:
             print(f"{filename} is already saved")
             return results
+    new_id = len(results) + 1
+    file_type = filename.split(".")[-1]
+    results.add((new_id, filename, file_type, lines, words, chars, avg_wpl, avg_cpw))
+    return results
 
+    
 def main():
     menu = '''
     Welcome to our program. choose what u wanna do (1-7)
@@ -90,11 +94,15 @@ def main():
                 print("No file is loaded. Pick 1 to load a file")
             case 2:
                 lines, words, characters,avg_wpl, avg_cpw = basic_statistics(filename)
-                print(lines)
-                print(words)
-                print(characters)
-                print(round(avg_wpl))
-                print(round(avg_cpw))
+                avg_cpw = round(avg_cpw)
+                avg_wpl = round(avg_wpl)
+                result = save_result(result, filename, lines, words, characters, avg_wpl, avg_cpw)
+
+                print(result)
+
+
+
+
             case 3:
                 print("3")
             case 4:
