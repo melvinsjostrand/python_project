@@ -1,6 +1,4 @@
 import os
-
-
 #För att hämta alla mina txt filer som jag har nersparat
 def get_files():
     txt_files = []
@@ -11,21 +9,19 @@ def get_files():
     return txt_files
 
 
-
 #för att välja vilken fil du vill läsa
 def load_file(files):  
-    choice = input(f"Type the filename you want to read or choose a file between 1 - {len(files)}:")
+    choice = input(f"Type the filename you want to read or choose a file between 1 - {len(files)}: ")
     if choice.isdigit() and 1 <= int(choice) <= len(files):
-        filename = files[choice - 1]
-        print(f"Loading {filename}")
+        filename = files[int(choice) - 1]
+        print(filename)
         return filename
-
     if choice + ".txt" in files:
         print(f"Loading {choice}")
         return choice + ".txt"
-
-    print("File not found. Pick 1 to try again.")
+    print("File not found. Pick 1 to try again")
     return None
+
 
 #för att läsa och räkna grundstatistik
 def basic_statistics(filename):
@@ -33,8 +29,8 @@ def basic_statistics(filename):
     file = open(filename, 'r', encoding="utf-8")
     for line in file:
         total_words += words(line)
-    return "no", total_words, "no"
 
+    return "no", total_words, "no"
 
 
 def words(line):
@@ -59,7 +55,11 @@ def main():
     filename = None
     while running == True:
         print()
-        choice = int(input("choose what u wanna do (1-7)"))
+        answer = input("choose what u wanna do (1-7)")
+        if not answer.isdigit():
+            print("Invalid choice: Pick between 1-7")
+            continue
+        choice = int(answer)
         match choice:
             case 1:
                 files = get_files()
