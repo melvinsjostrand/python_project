@@ -38,7 +38,7 @@ def basic_statistics(filename):
 
 def chars(line):
     count = 0
-    line = line.replace(" ", "")
+    line = line.rstrip("\n").replace(" ", "")
     print(line)
     for ch in line:
         count += 1
