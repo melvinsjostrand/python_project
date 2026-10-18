@@ -1,4 +1,6 @@
 import os
+import matplotlib.pyplot as plt
+
 #För att hämta alla mina txt filer som jag har nersparat
 def get_files():
     txt_files = []
@@ -49,6 +51,16 @@ def chars(line):
 def words(line):
     return len(line.split())
 
+
+def vis_graph(filename, lines, words, characters,avg_wpl, avg_cpw):
+    plt.title("Basic_statistics for: " + filename)
+    plt.ylabel("Count")
+    plt.bar(["lines","words","characters","avg_wpl", "avg_cpw"],[lines,words,characters,avg_wpl, avg_cpw], label = "statistics")
+    plt.tight_layout()
+    plt.legend()
+    plt.show()
+
+
 def save_result(results, filename, lines,words,chars, avg_wpl, avg_cpw):
     for saved in results:
         if saved[1] == filename:
@@ -96,6 +108,8 @@ def main():
                 lines, words, characters,avg_wpl, avg_cpw = basic_statistics(filename)
                 avg_cpw = round(avg_cpw)
                 avg_wpl = round(avg_wpl)
+                print(avg_cpw, avg_wpl)
+                vis_graph(filename, lines, words, characters,avg_wpl, avg_cpw)
                 result = save_result(result, filename, lines, words, characters, avg_wpl, avg_cpw)
 
                 print(result)
