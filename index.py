@@ -53,13 +53,17 @@ def words(line):
 
 
 def vis_graph(filename, lines, words, characters,avg_wpl, avg_cpw):
-    plt.title("Basic_statistics for: " + filename)
-    plt.ylabel("Count")
-    plt.bar(["lines","words","characters","avg_wpl", "avg_cpw"],[lines,words,characters,avg_wpl, avg_cpw], label = "statistics")
-    plt.tight_layout()
-    plt.legend()
-    plt.show()
 
+    fig, (left, right) = plt.subplots(1, 2, figsize=(12, 5))
+    fig.suptitle("Basic statistics for:" + filename, fontweight="bold")    
+    plt.ylabel("Count")
+    right.bar(["Words per line", "Characters per word"], [avg_wpl, avg_cpw],
+          color=["gold", "plum"])
+    left.bar(["Lines", "Words", "Characters"], [lines, words, characters],
+         color=["skyblue", "lightgreen", "lightcoral"])
+
+    plt.tight_layout()
+    plt.show()
 
 def save_result(results, filename, lines,words,chars, avg_wpl, avg_cpw):
     for saved in results:
