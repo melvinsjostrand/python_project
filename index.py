@@ -31,15 +31,26 @@ def basic_statistics(filename):
     amount_char = 0
     lines = 0
     file = open(filename, 'r', encoding="utf-8")
+    #går igenom hela filen rad för rad
     for line in file:
+        #lägger ihop alla ord
         total_words += words(line)
+        #lägger ihop alla karaktärer jag hämtar
         amount_char += chars(line)
+        #räknar antal rader
         lines += 1
 
     avg_wpl = total_words / lines
     avg_cpw = amount_char / total_words
     return lines, total_words, amount_char, avg_wpl,avg_cpw 
 
+
+#hämtar alla ord jag har på en line       
+def words(line):
+    return len(line.split())
+
+
+#Hämtar alla karaktärer på raden
 def chars(line):
     count = 0
     line = line.rstrip("\n").replace(" ", "")
@@ -47,16 +58,14 @@ def chars(line):
         count += 1
     return count
 
-        
-def words(line):
-    return len(line.split())
 
-
+#Skapar graph för basic stats
 def vis_graph(filename, lines, words, characters,avg_wpl, avg_cpw):
-
+    #delar upp graphen i två delar så att man kan se de olika värdena
     fig, (left, right) = plt.subplots(1, 2, figsize=(12, 5))
     fig.suptitle("Basic statistics for:" + filename, fontweight="bold")    
     plt.ylabel("Count")
+    #Gör min vänsta och högra graph. väljer färg.
     right.bar(["Words per line", "Characters per word"], [avg_wpl, avg_cpw],
           color=["gold", "plum"])
     left.bar(["Lines", "Words", "Characters"], [lines, words, characters],
@@ -65,8 +74,11 @@ def vis_graph(filename, lines, words, characters,avg_wpl, avg_cpw):
     plt.tight_layout()
     plt.show()
 
+
+#sparar alla resultat i ett set
 def save_result(results, filename, lines,words,chars, avg_wpl, avg_cpw):
     for saved in results:
+        #kollar ifall settet redan finns sparat
         if saved[1] == filename:
             print(f"{filename} is already saved")
             return results
@@ -117,10 +129,6 @@ def main():
                 result = save_result(result, filename, lines, words, characters, avg_wpl, avg_cpw)
 
                 print(result)
-
-
-
-
             case 3:
                 print("3")
             case 4:
