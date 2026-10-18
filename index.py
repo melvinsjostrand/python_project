@@ -26,15 +26,17 @@ def load_file(files):
 #för att läsa och räkna grundstatistik
 def basic_statistics(filename):
     total_words = 0
-    amound_char = 0
+    amount_char = 0
     lines = 0
     file = open(filename, 'r', encoding="utf-8")
     for line in file:
         total_words += words(line)
-        amound_char += chars(line)
+        amount_char += chars(line)
         lines += 1
 
-    return lines, total_words, amound_char
+    avg_wpl = total_words / lines
+    avg_cpw = amount_char / total_words
+    return lines, total_words, amount_char, avg_wpl,avg_cpw 
 
 def chars(line):
     count = 0
@@ -48,7 +50,11 @@ def chars(line):
 def words(line):
     return len(line.split())
 
-
+def save_result(results, filename, lines,words,chars):
+    for saved in results:
+        if saved[1] == filename:
+            print(f"{filename} is already saved")
+            return results
 
 def main():
     menu = '''
@@ -65,6 +71,7 @@ def main():
     print(menu)
     running = True
     filename = None
+    result = set()
     while running == True:
         print()
         answer = input("choose what u wanna do (1-7)")
@@ -82,10 +89,12 @@ def main():
             case 2 | 3 | 4 | 5 | 6 if filename is None:
                 print("No file is loaded. Pick 1 to load a file")
             case 2:
-                lines, words, characters = basic_statistics(filename)
+                lines, words, characters,avg_wpl, avg_cpw = basic_statistics(filename)
                 print(lines)
                 print(words)
                 print(characters)
+                print(round(avg_wpl))
+                print(round(avg_cpw))
             case 3:
                 print("3")
             case 4:
