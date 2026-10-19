@@ -26,29 +26,41 @@ def load_file(files):
 
 
 #för att läsa och räkna grundstatistik
-def basic_statistics(filename):
-    total_words = 0
-    amount_char = 0
-    lines = 0
+def file_reader(filename):
+    stats = {
+    "lines": 0,
+    "words": 0,
+    "chars": 0,
+    "chars_with_spaces": 0,
+    "word_counts": {}
+    }
+
     file = open(filename, 'r', encoding="utf-8")
     #går igenom hela filen rad för rad
     for line in file:
         #lägger ihop alla ord
-        total_words += words(line)
-        #lägger ihop alla karaktärer jag hämtar
-        amount_char += chars(line)
+        stats["words"] += words(line)
+        #lägger ihop alla karaktärer med spaces jag hämtar
+        stats["chars_with_spaces"] += chars_with_space(line)
+        #lägger ihop alla karaktärer utan spaces jag hämtar 
+        stats["chars"] += chars(line)
         #räknar antal rader
-        lines += 1
-
-    avg_wpl = total_words / lines
-    avg_cpw = amount_char / total_words
-    return lines, total_words, amount_char, avg_wpl,avg_cpw 
-
+        stats["lines"] += 1
+    
+    file.close()
+    stats["avg_wpl"] = stats["words"] / stats["lines"] if stats["lines"] > 0 else 0
+    stats["avg_cpw"] = stats["chars"] / stats["words"] if stats["words"] > 0 else 0
+    return stats
 
 #hämtar alla ord jag har på en line       
 def words(line):
     return len(line.split())
 
+def chars_with_space(line):
+    count = 0
+    for ch in line:
+        count += 1
+    return count
 
 #Hämtar alla karaktärer på raden
 def chars(line):
@@ -59,24 +71,24 @@ def chars(line):
     return count
 
 
-#Skapar graph för basic stats
-def vis_graph(filename, lines, words, characters,avg_wpl, avg_cpw):
-    #delar upp graphen i två delar så att man kan se de olika värdena
+#Skapar grafen för basic stats
+def vis_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl, avg_cpw):
+    #delar upp grafen i två delar så att man kan se de olika värdena
     fig, (left, right) = plt.subplots(1, 2, figsize=(12, 5))
     fig.suptitle("Basic statistics for:" + filename, fontweight="bold")    
     plt.ylabel("Count")
-    #Gör min vänsta och högra graph. väljer färg.
+    #Gör min vänsta och högra graf. väljer färg.
     right.bar(["Words per line", "Characters per word"], [avg_wpl, avg_cpw],
           color=["gold", "plum"])
-    left.bar(["Lines", "Words", "Characters"], [lines, words, characters],
-         color=["skyblue", "lightgreen", "lightcoral"])
+    left.bar(["Lines", "Words", "Characters", "Characters with spaces"], [lines, words, characters, characters_with_spaces],
+         color=["skyblue", "lightgreen", "lightcoral", "purple"])
 
     plt.tight_layout()
     plt.show()
 
 
 #sparar alla resultat i ett set
-def save_result(results, filename, lines,words,chars, avg_wpl, avg_cpw):
+def save_result(results, filename, lines,words,chars,chars_with_spaces,avg_wpl, avg_cpw):
     for saved in results:
         #kollar ifall settet redan finns sparat
         if saved[1] == filename:
@@ -84,7 +96,7 @@ def save_result(results, filename, lines,words,chars, avg_wpl, avg_cpw):
             return results
     new_id = len(results) + 1
     file_type = filename.split(".")[-1]
-    results.add((new_id, filename, file_type, lines, words, chars, avg_wpl, avg_cpw))
+    results.add((new_id, filename, file_type, lines, words, chars, chars_with_spaces,avg_wpl, avg_cpw))
     return results
 
     
@@ -102,8 +114,9 @@ def main():
 
     print(menu)
     running = True
+    stats = None
     filename = None
-    result = set()
+    results = set()
     while running == True:
         print()
         answer = input("choose what u wanna do (1-7)")
@@ -118,17 +131,22 @@ def main():
                 for file in range(len(files)):
                     print(file + 1,files[file])
                 filename = load_file(files)
+                if file is not None:
+                    stats = file_reader(filename)
+
+                print(stats)
             case 2 | 3 | 4 | 5 | 6 if filename is None:
                 print("No file is loaded. Pick 1 to load a file")
             case 2:
-                lines, words, characters,avg_wpl, avg_cpw = basic_statistics(filename)
-                avg_cpw = round(avg_cpw)
-                avg_wpl = round(avg_wpl)
-                print(avg_cpw, avg_wpl)
-                vis_graph(filename, lines, words, characters,avg_wpl, avg_cpw)
-                result = save_result(result, filename, lines, words, characters, avg_wpl, avg_cpw)
-
-                print(result)
+                print("Total number of lines: ",stats["lines"])
+                print("Total number of words: ",stats["words"])
+                print("Total number of characters without spaces",stats["chars"])
+                print("Total number of characters with spaces", stats["chars_with_spaces"])
+                print("Average words per line:", round(stats["avg_wpl"]))
+                print("Average characters per word: ",round(stats["avg_cpw"]))
+                vis_graph(filename, stats["lines"],stats["words"],stats["chars"],stats["chars_with_spaces"],stats["avg_wpl"],stats["avg_cpw"])
+                results = save_result(results, filename, stats["lines"], stats["words"],stats["chars"], stats["chars_with_spaces"],round(stats["avg_wpl"]), round(stats["avg_cpw"]))
+                print(results)
             case 3:
                 print("3")
             case 4:
