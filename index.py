@@ -96,12 +96,13 @@ def save_section(results, filename, section, data):
         results[filename][section] = data
     return results
 
-def export_pdf(results):
+def export_pdf(results,filename):
     if not results:
         print("Nothing to export. Run option 2-5 first.")
         return
     os.makedirs("results", exist_ok=True)
-    path = os.path.join("results", "results.txt")
+    name = filename.replace(".txt", "")
+    path = os.path.join("results", f"{name}_results.txt")
     print(results)
     file = open(path, "w", encoding="utf-8")
     for filename, sections in results.items():
@@ -139,7 +140,7 @@ def main():
 6. Export results
 7. Exit
 ==================================================
-    '''
+'''
 
     running = True
     stats = None
@@ -163,6 +164,7 @@ def main():
                 filename = load_file(files)
                 if file is not None:
                     stats = file_reader(filename)
+                    results = {}
             case 2 | 3 | 4 | 5 | 6 if filename is None:
                 print("No file is loaded. Pick 1 to load a file")
             case 2:
@@ -193,7 +195,7 @@ def main():
                 print("5")
                 input("Press Enter to continue...")
             case 6:
-                export_pdf(results)
+                export_pdf(results,filename)
             case 7:
                 print("Thank you for using Text Analyser!")
                 running = False
