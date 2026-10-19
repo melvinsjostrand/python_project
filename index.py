@@ -128,24 +128,27 @@ def export_pdf(results):
     
 def main():
     menu = '''
-    Welcome to our program. choose what u wanna do (1-7)
-    (1) Load a text file
-    (2) Display basic statistics
-    (3) Show word frequency analysis 
-    (4) Display sentence analysis
-    (5) Display character analysis
-    (6) Export results
-    (7) Exit programme
+==================================================
+ TEXT ANALYSER
+==================================================
+1. Load text file
+2. Display basic statistics
+3. Word frequency analysis
+4. Sentence analysis
+5. Character analysis
+6. Export results
+7. Exit
+==================================================
     '''
 
-    print(menu)
     running = True
     stats = None
     filename = None
     results = {}
     while running == True:
-        print()
-        print("Pick 8 to see menu")
+        print(menu)
+        if filename != None:
+            print("Current file: ", filename)
         answer = input("choose what u wanna do (1-7)")
         if not answer.isdigit():
             print("Invalid choice: Pick between 1-7")
@@ -160,8 +163,6 @@ def main():
                 filename = load_file(files)
                 if file is not None:
                     stats = file_reader(filename)
-
-                print(stats)
             case 2 | 3 | 4 | 5 | 6 if filename is None:
                 print("No file is loaded. Pick 1 to load a file")
             case 2:
@@ -180,17 +181,21 @@ def main():
                 "Average words per line": round(stats["avg_wpl"], 1),
                 "Average characters per word": round(stats["avg_cpw"], 1)
             })
-                print(results)
+
+                input("Press Enter to continue...")
             case 3:
                 print("3")
+                input("Press Enter to continue...")
             case 4:
                 print("4")
+                input("Press Enter to continue...")
             case 5:
                 print("5")
+                input("Press Enter to continue...")
             case 6:
                 export_pdf(results)
             case 7:
-                print("7")
+                print("Thank you for using Text Analyser!")
                 running = False
             case 8 :
                 print(menu)
