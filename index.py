@@ -1,5 +1,7 @@
 import os
 import matplotlib.pyplot as plt
+from datetime import datetime
+
 
 #För att hämta alla mina txt filer som jag har nersparat
 def get_files():
@@ -88,16 +90,40 @@ def vis_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl,
 
 
 #sparar alla resultat i ett set
-def save_result(results, filename, lines,words,chars,chars_with_spaces,avg_wpl, avg_cpw):
-    for saved in results:
-        #kollar ifall settet redan finns sparat
-        if saved[1] == filename:
-            print(f"{filename} is already saved")
-            return results
-    new_id = len(results) + 1
-    file_type = filename.split(".")[-1]
-    results.add((new_id, filename, file_type, lines, words, chars, chars_with_spaces,avg_wpl, avg_cpw))
+def save_section(results, filename, section, data):
+    if filename not in results:
+        results[filename] = {}
+        results[filename][section] = data
     return results
+
+def export_pdf(results):
+    if not results:
+        print("Nothing to export. Run option 2-5 first.")
+        return
+    os.makedirs("results", exist_ok=True)
+    path = os.path.join("results", "results.txt")
+    print(results)
+    file = open(path, "w", encoding="utf-8")
+    for filename, sections in results.items():
+        file.write("=" * 60 + "\n")
+        file.write("TEXT ANALYSIS RESULTS\n")
+        file.write("=" * 60 + "\n")
+        file.write(f"File analysed: {filename}\n")
+        file.write(f"Analysis date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+
+        for section, data in sections.items():
+            file.write(section.upper() + "\n")
+            file.write("-" * 30 + "\n")
+            for key, value in data.items():
+                file.write(f"{key}: {value}\n")
+            file.write("\n")
+
+    file.write("=" * 60 + "\n")
+    file.write("End of Analysis Report\n")
+    file.write("=" * 60 + "\n")
+    file.close()
+
+    print(f"Results exported to {path}")
 
     
 def main():
@@ -116,9 +142,10 @@ def main():
     running = True
     stats = None
     filename = None
-    results = set()
+    results = {}
     while running == True:
         print()
+        print("Pick 8 to see menu")
         answer = input("choose what u wanna do (1-7)")
         if not answer.isdigit():
             print("Invalid choice: Pick between 1-7")
@@ -145,7 +172,14 @@ def main():
                 print("Average words per line:", round(stats["avg_wpl"]))
                 print("Average characters per word: ",round(stats["avg_cpw"]))
                 vis_graph(filename, stats["lines"],stats["words"],stats["chars"],stats["chars_with_spaces"],stats["avg_wpl"],stats["avg_cpw"])
-                results = save_result(results, filename, stats["lines"], stats["words"],stats["chars"], stats["chars_with_spaces"],round(stats["avg_wpl"]), round(stats["avg_cpw"]))
+                results = save_section(results, filename, "Basic statistics", {
+                "Lines": stats["lines"],
+                "Words": stats["words"],
+                "Characters": stats["chars"],
+                "Characters with spaces": stats["chars_with_spaces"],
+                "Average words per line": round(stats["avg_wpl"], 1),
+                "Average characters per word": round(stats["avg_cpw"], 1)
+            })
                 print(results)
             case 3:
                 print("3")
@@ -154,10 +188,12 @@ def main():
             case 5:
                 print("5")
             case 6:
-                print("6")
+                export_pdf(results)
             case 7:
                 print("7")
                 running = False
+            case 8 :
+                print(menu)
             case _:
                 print("invalid choice: pick between 1-7")
 
