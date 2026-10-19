@@ -174,7 +174,6 @@ def main():
                 print("Total number of characters with spaces", stats["chars_with_spaces"])
                 print("Average words per line:", round(stats["avg_wpl"]))
                 print("Average characters per word: ",round(stats["avg_cpw"]))
-                vis_graph(filename, stats["lines"],stats["words"],stats["chars"],stats["chars_with_spaces"],stats["avg_wpl"],stats["avg_cpw"])
                 results = save_section(results, filename, "Basic statistics", {
                 "Lines": stats["lines"],
                 "Words": stats["words"],
@@ -183,6 +182,8 @@ def main():
                 "Average words per line": round(stats["avg_wpl"], 1),
                 "Average characters per word": round(stats["avg_cpw"], 1)
             })
+                input("Press Enter to open graph...")
+                vis_graph(filename, stats["lines"],stats["words"],stats["chars"],stats["chars_with_spaces"],stats["avg_wpl"],stats["avg_cpw"])
 
                 input("Press Enter to continue...")
             case 3:
@@ -201,6 +202,7 @@ def main():
                 running = False
             case 8 :
                 print(menu)
+                input("Press Enter to continue...")
             case _:
                 print("invalid choice: pick between 1-7")
 
