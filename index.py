@@ -37,7 +37,7 @@ def file_reader(filename):
     "word_counts": {},
     "sentence": []
     }
-    current = ""
+    current = "" #buffert till sentence funktionen
 
 
     file = open(filename, "r", encoding="utf-8")
@@ -53,6 +53,7 @@ def file_reader(filename):
         stats["lines"] += 1
         #Räknar antalet olika ord det finns i en text.
         word_count(line,stats["word_counts"])
+        #sparar i bufferten
         current = sentence(line, current, stats["sentence"])
 
     #Det som blev över när filen tog slut.
@@ -64,18 +65,17 @@ def file_reader(filename):
     stats["avg_cpw"] = stats["chars"] / stats["words"] if stats["words"] > 0 else 0
     return stats
 
+#Går igenom en "line" och kollar när det finns ett slut
 def sentence(line, current, sentences):
     line = line.strip()
     for i in range(len(line)):
         current += line[i]
-        if line[i] in ".!?":
-            if i + 1 == len(line) or line[i+1] == " ":
+        if line[i] in ".!?": #Letar efter skilljetecken
+            if i + 1 == len(line) or line[i+1] == " ":# kollar om en mening verkligen är slut. 
                 sentences.append(current.strip())
                 current=""
-    current += " "
+    current += " "#lägger till space efter den har gått igenom en "line"
     return current
-
-
 
 #Går igenom linjer och räknar hur många av varje ord som finns.
 def word_count(line,word_count):
@@ -89,6 +89,7 @@ def word_count(line,word_count):
                 word_count[word] += 1
             else:
                 word_count[word] = 1
+
 #hämtar alla ord jag har på en line       
 def words(line):
     return len(line.split())
