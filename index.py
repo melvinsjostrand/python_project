@@ -240,7 +240,7 @@ def main():
                 for count, word in items:
                     if count == 1:
                         appear_once += 1
-
+aaaaa
                 print(appear_once)
                 word_data = {
                     "Unique words": len(stats["word_counts"]),
