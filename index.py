@@ -35,6 +35,7 @@ def file_reader(filename):
     "chars": 0,
     "chars_with_spaces": 0,
     "word_counts": {},
+    "letter_counter":{},
     "sentence": []
     }
     current = "" #buffert till sentence funktionen
@@ -55,7 +56,7 @@ def file_reader(filename):
         word_count(line,stats["word_counts"])
         #sparar i bufferten
         current = sentence(line, current, stats["sentence"])
-
+        most_common_letter(line,stats["letter_counter"])
     #Det som blev över när filen tog slut.
     if current.strip():
         stats["sentence"].append(current.strip())
@@ -95,10 +96,7 @@ def words(line):
     return len(line.split())
 
 def chars_with_space(line):
-    count = 0
-    for ch in line:
-        count += 1
-    return count
+    return len(line.rstrip("\n").replace(" ", ""))
 
 #Hämtar alla karaktärer på raden
 def chars(line):
@@ -124,32 +122,39 @@ def vis_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl,
     plt.tight_layout()
     plt.show()
 
-
+#sparar all data i blocket, kollar också filnamn och ifall resultat har någon data i sig
 def save_section(results, filename, section, data):
+    #kollar ifall filen inte finns i resultat. om den inte finns så rensar jag mitt resultat
     if filename not in results:
         results[filename] = {}
     results[filename][section] = data
     return results
 
-def export_pdf(results,filename):
+def export_txt(results,filename):
+    #Kollar ifall resultat har någon data i sig
     if not results:
         print("Nothing to export. Run option 2-5 first.")
         return
+    #Skapar en mapp och om den redan finns så skippar den att skapa
     os.makedirs("results", exist_ok=True)
+    #Gör om namnet så det inte finns ".txt" i sig
     name = filename.replace(".txt", "")
+    #Hämtar pathen till mappen och sen får du namnet "Filnamn" + resultat
     path = os.path.join("results", f"{name}_results.txt")
     print(results)
     file = open(path, "w", encoding="utf-8")
+    #Delar upp så jag kan hantera mina "sections"
     for filename, sections in results.items():
         file.write("=" * 60 + "\n")
         file.write("TEXT ANALYSIS RESULTS\n")
         file.write("=" * 60 + "\n")
         file.write(f"File analysed: {filename}\n")
         file.write(f"Analysis date: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n\n")
-
+        #Delar upp mina sections och data sp jag kan skriva ut all min data
         for section, data in sections.items():
             file.write(section.upper() + "\n")
             file.write("-" * 30 + "\n")
+            #Delar upp min data så jag får mitt keyValue och mitt själva värde
             for key, value in data.items():
                 file.write(f"{key}: {value}\n")
             file.write("\n")
@@ -161,7 +166,14 @@ def export_pdf(results,filename):
 
     print(f"Results exported to {path}")
 
-    
+def most_common_letter(line,letter_counter):
+    line = line.split()
+    for word in line:
+        for ch in word:
+            if ch in letter_counter:
+                letter_counter[ch] += 1
+            else:
+                letter_counter[ch] = 1
 def main():
     menu = '''
 ==================================================
@@ -181,6 +193,7 @@ def main():
     stats = None
     filename = None
     results = {}
+    appear_once = 0
     while running == True:
         print(menu)
         if filename != None:
@@ -200,15 +213,19 @@ def main():
                 if filename is not None:
                     stats = file_reader(filename)
                     results = {}
+            #Kollar ifall det finns en fil, om inte så går det inte köra koden
             case 2 | 3 | 4 | 5 | 6 if filename is None:
                 print("No file is loaded. Pick 1 to load a file")
             case 2:
+                
+                #Printar alla värden jag vill visa i basic stats
                 print("Total number of lines: ",stats["lines"])
                 print("Total number of words: ",stats["words"])
                 print("Total number of characters without spaces",stats["chars"])
                 print("Total number of characters with spaces", stats["chars_with_spaces"])
                 print("Average words per line:", round(stats["avg_wpl"]))
                 print("Average characters per word: ",round(stats["avg_cpw"]))
+                #skickar all data om "basic stats"
                 results = save_section(results, filename, "Basic statistics", {
                 "Lines": stats["lines"],
                 "Words": stats["words"],
@@ -218,56 +235,68 @@ def main():
                 "Average characters per word": round(stats["avg_cpw"], 1)
             })
                 input("Press Enter to open graph...")
+                #skapar en graf
                 vis_graph(filename, stats["lines"],stats["words"],stats["chars"],stats["chars_with_spaces"],stats["avg_wpl"],stats["avg_cpw"])
 
                 input("Press Enter to continue...")
             case 3:
-                appear_once = 0
+                #delar upp de olika delarna i mitt set så jag kan lätt skriva ut dem
                 items = [(count, word) for word, count in stats["word_counts"].items()]
+                #Sorterar så störst är först i nummering
                 items.sort(reverse=True)
                 total = stats["words"]
+                #kollar ifall ordet är en bokstav
                 letter_words = [word for word in stats["word_counts"] if word.isalpha()]
+                #Hämtar största och minsta ordet
                 longest = max(letter_words, key=len)
                 shortest = min(letter_words, key=len)
-
-                print(f"Longest word: {longest} ({len(longest)} characters)")
-                print(f"Shortest word: {shortest} ({len(shortest)} characters)")
-                print("Top 10 most common words:")
-                for place, (count, word) in enumerate(items[:10], start=1):
-                    percent = count / total * 100
-                    print(f"{place:>2}. {word:<12} {count:>7,} times ({percent:>4.1f}%)")
-
-                print(len(stats["word_counts"]))
-                for count, word in items:
-                    if count == 1:
-                        appear_once += 1
-
-                print(appear_once)
+                #sparar lite utan datan som vi ska skriva ut
                 word_data = {
                     "Unique words": len(stats["word_counts"]),
                     "Words appearing only once": appear_once,
                     "Longset word": longest,
                     "Shortest word": shortest
                 }
+                print(f"Longest word: {longest} ({len(longest)} characters)")
+                print(f"Shortest word: {shortest} ({len(shortest)} characters)")
+                print("Top 10 most common words:")
+                #Delar upp min "items" i två delar men jag numrerar den också så jag kan skriva ut vilken plats den är på.
                 for place, (count, word) in enumerate(items[:10], start=1):
+                    #räknar ut % hur vanlig varje TOP 10 ord är.
                     percent = count / total * 100
+                    print(f"{place:>2}. {word:<12} {count:>7,} times ({percent:>4.1f}%)")
+                    #lägger in min tabel om vanligaste orden i min data som skickas till resultat.
                     word_data[f"{place:>2}. {word:<12}"] = f"{count:>7,} times ({percent:>4.1f}%)"
+                print(len(stats["word_counts"]))
+                #kollar vilka ord som endast kommer fram en gång.
+                for count, word in items:
+                    if count == 1:
+                        appear_once += 1
+                print(appear_once)
 
+                #sparar all data från case 3
                 results = save_section(results, filename, "Word analysis", word_data)
                 
-                print("Saved sections:", list(results[filename].keys()))
                 input("Press Enter to continue...")
             case 4:
                 print("4")
                 input("Press Enter to continue...")
             case 5:
                 print("5")
+                letters = [(count, letters) for letters , count in stats["letter_counter"].items()]
+                total_letters = stats["letter_counter"]
+                for place, (count, letters) in enumerate(letters[:10], start=1):
+                    percent_letters = count / total_letters * 100
+                    print(f"{place:>2}. {letters:<12} {count:>7,} times ({percent_letters:>4.1f}%)")
                 input("Press Enter to continue...")
             case 6:
-                export_pdf(results,filename)
+                #Skapar en txt fil med all data som man gått igenom.
+                export_txt(results,filename)
             case 7:
+                #Avslutar programmet genom att sätta min "running" som false
                 print("Thank you for using Text Analyser!")
                 running = False
+            #Gör så jag endast kan skriva mellan 1-7
             case _:
                 print("invalid choice: pick between 1-7")
 
