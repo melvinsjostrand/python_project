@@ -37,7 +37,7 @@ def file_reader(filename):
     "word_counts": {}
     }
 
-    file = open(filename, 'r', encoding="utf-8")
+    file = open(filename, "r", encoding="utf-8")
     #går igenom hela filen rad för rad
     for line in file:
         #lägger ihop alla ord
@@ -58,13 +58,15 @@ def file_reader(filename):
 
 def word_count(line,word_count):
 
-    line = line.lower().strip(".,!?;:\"'()-").split()
+    line = line.lower().split()
 
     for word in line:
-        if word == word_count:
-            word_count[word] += 1
-        else:
-            word_count[word] = 1
+        word = word.strip(".,!?;:”’()-_")
+        if word:
+            if word in word_count:
+                word_count[word] += 1
+            else:
+                word_count[word] = 1
 #hämtar alla ord jag har på en line       
 def words(line):
     return len(line.split())
@@ -100,11 +102,10 @@ def vis_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl,
     plt.show()
 
 
-#sparar alla resultat i ett set
 def save_section(results, filename, section, data):
     if filename not in results:
         results[filename] = {}
-        results[filename][section] = data
+    results[filename][section] = data
     return results
 
 def export_pdf(results,filename):
@@ -121,7 +122,7 @@ def export_pdf(results,filename):
         file.write("TEXT ANALYSIS RESULTS\n")
         file.write("=" * 60 + "\n")
         file.write(f"File analysed: {filename}\n")
-        file.write(f"Analysis date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+        file.write(f"Analysis date: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n\n")
 
         for section, data in sections.items():
             file.write(section.upper() + "\n")
@@ -173,10 +174,9 @@ def main():
                 for file in range(len(files)):
                     print(file + 1,files[file])
                 filename = load_file(files)
-                if file is not None:
+                if filename is not None:
                     stats = file_reader(filename)
                     results = {}
-                print(stats)
             case 2 | 3 | 4 | 5 | 6 if filename is None:
                 print("No file is loaded. Pick 1 to load a file")
             case 2:
@@ -199,7 +199,38 @@ def main():
 
                 input("Press Enter to continue...")
             case 3:
-                print("3")
+                appear_once = 0
+                items = [(count, word) for word, count in stats["word_counts"].items()]
+                items.sort(reverse=True)
+                total = stats["words"]
+                letter_words = [word for word in stats["word_counts"] if word.isalpha()]
+                longest = max(letter_words, key=len)
+                shortest = min(letter_words, key=len)
+
+                print(f"Longest word: {longest} ({len(longest)} characters)")
+                print(f"Shortest word: {shortest} ({len(shortest)} characters)")
+                print("Top 10 most common words:")
+                for place, (count, word) in enumerate(items[:10], start=1):
+                    percent = count / total * 100
+                    print(f"{place:>2}. {word:<12} {count:>7,} times ({percent:>4.1f}%)")
+
+                print(len(stats["word_counts"]))
+                for count, word in items:
+                    if count == 1:
+                        appear_once += 1
+
+                print(appear_once)
+                word_data = {
+                    "Unique words": len(stats["word_counts"]),
+                    "Words appearing only once": appear_once
+                }
+                for place, (count, word) in enumerate(items[:10], start=1):
+                    percent = count / total * 100
+                    word_data[f"{place:>2}. {word:<12}"] = f"{count:>7,} times ({percent:>4.1f}%)"
+
+                results = save_section(results, filename, "Word analysis", word_data)
+                
+                print("Saved sections:", list(results[filename].keys()))
                 input("Press Enter to continue...")
             case 4:
                 print("4")
@@ -212,9 +243,6 @@ def main():
             case 7:
                 print("Thank you for using Text Analyser!")
                 running = False
-            case 8 :
-                print(menu)
-                input("Press Enter to continue...")
             case _:
                 print("invalid choice: pick between 1-7")
 
