@@ -58,7 +58,7 @@ def file_reader(filename):
 
 def word_count(line,word_count):
 
-    line = line.lower().split()
+    line = line.lower().strip(".,!?;:\"'()-").split()
 
     for word in line:
         if word == word_count:
