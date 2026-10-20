@@ -122,7 +122,7 @@ def vis_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl,
 
     plt.tight_layout()
     plt.show()
-kndawkonawko
+
 
 def save_section(results, filename, section, data):
     if filename not in results:
@@ -244,7 +244,9 @@ def main():
                 print(appear_once)
                 word_data = {
                     "Unique words": len(stats["word_counts"]),
-                    "Words appearing only once": appear_once
+                    "Words appearing only once": appear_once,
+                    "Longset word": longest,
+                    "Shortest word": shortest
                 }
                 for place, (count, word) in enumerate(items[:10], start=1):
                     percent = count / total * 100
