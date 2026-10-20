@@ -122,7 +122,7 @@ def vis_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl,
 
     plt.tight_layout()
     plt.show()
-
+kndawkonawko
 
 def save_section(results, filename, section, data):
     if filename not in results:
