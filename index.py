@@ -48,12 +48,23 @@ def file_reader(filename):
         stats["chars"] += chars(line)
         #räknar antal rader
         stats["lines"] += 1
+        word_count(line,stats["word_counts"])
     
     file.close()
     stats["avg_wpl"] = stats["words"] / stats["lines"] if stats["lines"] > 0 else 0
     stats["avg_cpw"] = stats["chars"] / stats["words"] if stats["words"] > 0 else 0
     return stats
 
+
+def word_count(line,word_count):
+
+    line = line.lower().split()
+
+    for word in line:
+        if word == word_count:
+            word_count[word] += 1
+        else:
+            word_count[word] = 1
 #hämtar alla ord jag har på en line       
 def words(line):
     return len(line.split())
@@ -165,6 +176,7 @@ def main():
                 if file is not None:
                     stats = file_reader(filename)
                     results = {}
+                print(stats)
             case 2 | 3 | 4 | 5 | 6 if filename is None:
                 print("No file is loaded. Pick 1 to load a file")
             case 2:
