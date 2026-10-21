@@ -56,7 +56,7 @@ def file_reader(filename):
         word_count(line,stats["word_counts"])
         #sparar i bufferten
         current = sentence(line, current, stats["sentence"])
-        most_common_letter(line,stats["letter_counter"])
+        amount_letters(line,stats["letter_counter"])
     #Det som blev över när filen tog slut.
     if current.strip():
         stats["sentence"].append(current.strip())
@@ -80,11 +80,9 @@ def sentence(line, current, sentences):
 
 #Går igenom linjer och räknar hur många av varje ord som finns.
 def word_count(line,word_count):
-
     line = line.lower().split()
-
     for word in line:
-        word = word.strip(".,!?;:”’()-_")
+        word = word.strip(".,!?;:”’()-_'\"")
         if word:
             if word in word_count:
                 word_count[word] += 1
@@ -166,14 +164,15 @@ def export_txt(results,filename):
 
     print(f"Results exported to {path}")
 
-def most_common_letter(line,letter_counter):
+def amount_letters(line,letter_counter):
     line = line.split()
     for word in line:
-        for ch in word:
-            if ch in letter_counter:
-                letter_counter[ch] += 1
-            else:
-                letter_counter[ch] = 1
+        if word.isalpha():
+            for ch in word:
+                if ch in letter_counter:
+                    letter_counter[ch] += 1
+                else:
+                    letter_counter[ch] = 1
 def main():
     menu = '''
 ==================================================
@@ -282,12 +281,11 @@ def main():
                 print("4")
                 input("Press Enter to continue...")
             case 5:
-                print("5")
-                letters = [(count, letters) for letters , count in stats["letter_counter"].items()]
-                total_letters = stats["letter_counter"]
-                for place, (count, letters) in enumerate(letters[:10], start=1):
-                    percent_letters = count / total_letters * 100
-                    print(f"{place:>2}. {letters:<12} {count:>7,} times ({percent_letters:>4.1f}%)")
+                letters = [(letter_count, letter) for letter , letter_count in stats["letter_counter"].items()]
+                letters.sort(reverse=True)
+                for place, (letter_count, letter) in enumerate(letters[:10], start=1):
+                    percent_letters = letter_count / stats["chars"] * 100
+                    print(f"{place:>2}. {letter:<12} {letter_count:>7,} times ({percent_letters:>4.1f}%)")
                 input("Press Enter to continue...")
             case 6:
                 #Skapar en txt fil med all data som man gått igenom.

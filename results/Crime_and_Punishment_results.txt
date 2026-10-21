@@ -1,0 +1,35 @@
+============================================================
+TEXT ANALYSIS RESULTS
+============================================================
+File analysed: Crime_and_Punishment.txt
+Analysis date: 2026-10-21 08:34:47
+
+BASIC STATISTICS
+------------------------------
+Lines: 22749
+Words: 206656
+Characters: 943850
+Characters with spaces: 943850
+Average words per line: 9.1
+Average characters per word: 4.6
+
+WORD ANALYSIS
+------------------------------
+Unique words: 11283
+Words appearing only once: 0
+Longset word: disproportionately
+Shortest word: i
+ 1. the         :   7,941 times ( 3.8%)
+ 2. and         :   6,791 times ( 3.3%)
+ 3. to          :   5,319 times ( 2.6%)
+ 4. he          :   4,584 times ( 2.2%)
+ 5. a           :   4,576 times ( 2.2%)
+ 6. of          :   3,905 times ( 1.9%)
+ 7. you         :   3,693 times ( 1.8%)
+ 8. i           :   3,519 times ( 1.7%)
+ 9. in          :   3,222 times ( 1.6%)
+10. it          :   2,926 times ( 1.4%)
+
+============================================================
+End of Analysis Report
+============================================================
