@@ -37,6 +37,7 @@ def file_reader(filename):
     "word_counts": {},
     "letter_counter":{},
     "sentence": [],
+    "punctuation": 0,
     "digits": 0
     }
     current = "" #buffert till sentence funktionen
@@ -57,12 +58,12 @@ def file_reader(filename):
         word_count(line,stats["word_counts"])
         #sparar i bufferten
         current = sentence(line, current, stats["sentence"])
-<<<<<<< Updated upstream
         amount_letters(line,stats["letter_counter"])
-=======
-        most_common_letter(line,stats["letter_counter"])
+        stats["punctuation"] += count_punctuation(line)
         stats["digits"] += digits(line)
->>>>>>> Stashed changes
+
+
+
     #Det som blev över när filen tog slut.
     if current.strip():
         stats["sentence"].append(current.strip())
@@ -71,6 +72,37 @@ def file_reader(filename):
     stats["avg_wpl"] = stats["words"] / stats["lines"] if stats["lines"] > 0 else 0
     stats["avg_cpw"] = stats["chars"] / stats["words"] if stats["words"] > 0 else 0
     return stats
+
+
+#hämtar alla ord jag har på en line       
+def words(line):
+    return len(line.split())
+
+
+def chars_with_space(line):
+    return len(line.rstrip("\n"))
+
+
+#Hämtar alla karaktärer på raden
+def chars(line):
+    count = 0
+    line = line.rstrip("\n").replace(" ", "")
+    for ch in line:
+        count += 1
+    return count
+
+
+#Går igenom linjer och räknar hur många av varje ord som finns.
+def word_count(line,word_count):
+    line = line.lower().split()
+    for word in line:
+        word = word.strip(".,!?;:”’()-_'\"")
+        if word:
+            if word in word_count:
+                word_count[word] += 1
+            else:
+                word_count[word] = 1
+
 
 #Går igenom en "line" och kollar när det finns ett slut
 def sentence(line, current, sentences):
@@ -84,47 +116,34 @@ def sentence(line, current, sentences):
     current += " "#lägger till space efter den har gått igenom en "line"
     return current
 
-#Går igenom linjer och räknar hur många av varje ord som finns.
-def word_count(line,word_count):
-    line = line.lower().split()
+#kollar alla bokstäver
+def amount_letters(line,letter_counter):
+    line = line.split()
     for word in line:
-        word = word.strip(".,!?;:”’()-_'\"")
-        if word:
-            if word in word_count:
-                word_count[word] += 1
-            else:
-                word_count[word] = 1
+        if word.isalpha():
+            for ch in word:
+                if ch in letter_counter:
+                    letter_counter[ch] += 1
+                else:
+                    letter_counter[ch] = 1
 
-#hämtar alla ord jag har på en line       
-def words(line):
-    return len(line.split())
 
-def chars_with_space(line):
-    return len(line.rstrip("\n"))
-
-#Hämtar alla karaktärer på raden
-def chars(line):
+def count_punctuation(line):
+    punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
     count = 0
-    line = line.rstrip("\n").replace(" ", "")
+
     for ch in line:
-        count += 1
+        if ch in punctuation:
+            count += 1
     return count
-
-
-#Skapar grafen för basic stats
-def vis_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl, avg_cpw):
-    #delar upp grafen i två delar så att man kan se de olika värdena
-    fig, (left, right) = plt.subplots(1, 2, figsize=(12, 5))
-    fig.suptitle("Basic statistics for:" + filename, fontweight="bold")    
-    plt.ylabel("Count")
-    #Gör min vänsta och högra graf. väljer färg.
-    right.bar(["Words per line", "Characters per word"], [avg_wpl, avg_cpw],
-          color=["gold", "plum"])
-    left.bar(["Lines", "Words", "Characters", "Characters with spaces"], [lines, words, characters, characters_with_spaces],
-         color=["skyblue", "lightgreen", "lightcoral", "purple"])
-
-    plt.tight_layout()
-    plt.show()
+#räknar antal nummer
+def digits(line):
+    count = 0
+    line.split()
+    for dig in line:
+        if dig.isdigit():
+            count += 1
+    return count
 
 #sparar all data i blocket, kollar också filnamn och ifall resultat har någon data i sig
 def save_section(results, filename, section, data):
@@ -134,6 +153,8 @@ def save_section(results, filename, section, data):
     results[filename][section] = data
     return results
 
+
+#Skapar en ny mapp(om mappen inte finns) som sen skapar en txt fil med namnet av txtfilen vi har kollat igenom, sedan skriver ut all data som vi sparat ner
 def export_txt(results,filename):
     #Kollar ifall resultat har någon data i sig
     if not results:
@@ -170,32 +191,25 @@ def export_txt(results,filename):
 
     print(f"Results exported to {path}")
 
-def amount_letters(line,letter_counter):
-    line = line.split()
-    for word in line:
-<<<<<<< Updated upstream
-        if word.isalpha():
-            for ch in word:
-                if ch in letter_counter:
-                    letter_counter[ch] += 1
-                else:
-                    letter_counter[ch] = 1
-=======
-        for ch in word:
-            if ch in letter_counter:
-                letter_counter[ch] += 1
-            else:
-                letter_counter[ch] = 1
 
-def digits(line):
-    count = 0
-    line.split()
-    for dig in line:
-        if dig.isdigit():
-            count += 1
+#Skapar grafen för basic stats
+def vis_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl, avg_cpw):
+    #delar upp grafen i två delar så att man kan se de olika värdena
+    fig, (left, right) = plt.subplots(1, 2, figsize=(12, 5))
+    fig.suptitle("Basic statistics for:" + filename, fontweight="bold")    
+    plt.ylabel("Count")
+    #Gör min vänsta och högra graf. väljer färg.
+    right.bar(["Words per line", "Characters per word"], [avg_wpl, avg_cpw],
+          color=["gold", "plum"])
+    left.bar(["Lines", "Words", "Characters", "Characters with spaces"], [lines, words, characters, characters_with_spaces],
+         color=["skyblue", "lightgreen", "lightcoral", "purple"])
 
-    return count
->>>>>>> Stashed changes
+    plt.tight_layout()
+    plt.show()
+
+
+
+
 def main():
     menu = '''
 ==================================================
@@ -303,25 +317,11 @@ def main():
                 print("4")
                 input("Press Enter to continue...")
             case 5:
-<<<<<<< Updated upstream
                 letters = [(letter_count, letter) for letter , letter_count in stats["letter_counter"].items()]
                 letters.sort(reverse=True)
                 for place, (letter_count, letter) in enumerate(letters[:10], start=1):
                     percent_letters = letter_count / stats["chars"] * 100
                     print(f"{place:>2}. {letter:<12} {letter_count:>7,} times ({percent_letters:>4.1f}%)")
-=======
-                print("5")
-                letters = [(count, letters) for letters , count in stats["letter_counter"].items()]
-                #alla spaces
-                print(stats["chars"])
-                print(stats["chars_with_spaces"])
-                total_letters = stats["chars"]
-                letters.sort(reverse=True)
-                #Top 10 vanligaste bokstäverna i texten.
-                for place, (count, letters) in enumerate(letters[:10], start=1):
-                    percent_letters = count / total_letters * 100
-                    print(f"{place:>2}. {letters:<12} {count:>7,} times ({percent_letters:>4.1f}%)")
->>>>>>> Stashed changes
                 input("Press Enter to continue...")
             case 6:
                 #Skapar en txt fil med all data som man gått igenom.
