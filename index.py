@@ -249,7 +249,6 @@ def main():
     stats = None
     filename = None
     results = {}
-    appear_once = 0
     while running == True:
         print(menu)
         if filename != None:
@@ -300,6 +299,7 @@ def main():
 
                 input("Press Enter to continue...")
             case 3:
+                appear_once = 0
                 #delar upp de olika delarna i mitt set så jag kan lätt skriva ut dem
                 items = [(count, word) for word, count in stats["word_counts"].items()]
                 #Sorterar så störst är först i nummering
