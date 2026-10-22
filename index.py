@@ -39,7 +39,8 @@ def file_reader(filename):
     "sentence": [],
     "punctuation": 0,
     "digits": 0,
-    "other": {}
+    "other": {},
+    "long_words": 0
     }
     current = "" #buffert till sentence funktionen
 
@@ -64,7 +65,7 @@ def file_reader(filename):
         stats["digits"] += digits(line)
         other_chars(line, stats["other"])
 
-
+    stats["long_words"] = long_words(stats["word_counts"])
 
     #Det som blev över när filen tog slut.
     if current.strip():
@@ -98,7 +99,7 @@ def chars(line):
 def word_count(line,word_count):
     line = line.lower().split()
     for word in line:
-        word = word.strip(".,!?;:”’()-_'\"")
+        word = word.strip(".,!?;:”’“()--_'\"")
         if word:
             if word in word_count:
                 word_count[word] += 1
@@ -118,6 +119,13 @@ def sentence(line, current, sentences):
     current += " "#lägger till space efter den har gått igenom en "line"
     return current
 
+def long_words(words):
+    count = 0
+    for word in words:
+        if len(word) > 6:
+            count += 1
+
+    return count
 #kollar alla bokstäver
 def amount_letters(line, letter_counter):
     for ch in line.lower():
@@ -272,6 +280,11 @@ def main():
                 print("Total number of characters with spaces", stats["chars_with_spaces"])
                 print("Average words per line:", round(stats["avg_wpl"]))
                 print("Average characters per word: ",round(stats["avg_cpw"]))
+
+                sentence_amount = len(stats["sentence"])
+                long_words = stats["long_words"]
+                lix = (stats["words"]/sentence_amount) + ((long_words / stats["words"]) * 100)
+                print(round(lix , 1))
                 #skickar all data om "basic stats"
                 results = save_section(results, filename, "Basic statistics", {
                 "Lines": stats["lines"],
