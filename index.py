@@ -64,6 +64,7 @@ def file_reader(filename):
         stats["punctuation"] += count_punctuation(line)
         stats["digits"] += digits(line)
         other_chars(line, stats["other"])
+    file.close()
 
     stats["long_words"] = long_words(stats["word_counts"])
 
@@ -71,7 +72,6 @@ def file_reader(filename):
     if current.strip():
         stats["sentence"].append(current.strip())
     
-    file.close()
     stats["avg_wpl"] = stats["words"] / stats["lines"] if stats["lines"] > 0 else 0
     stats["avg_cpw"] = stats["chars"] / stats["words"] if stats["words"] > 0 else 0
     return stats
@@ -99,7 +99,7 @@ def chars(line):
 def word_count(line,word_count):
     line = line.lower().split()
     for word in line:
-        word = word.strip(".,!?;:”’“()--_'\"")
+        word = word.strip(".,!?;:""()--_'\"")
         if word:
             if word in word_count:
                 word_count[word] += 1
@@ -119,13 +119,16 @@ def sentence(line, current, sentences):
     current += " "#lägger till space efter den har gått igenom en "line"
     return current
 
-def long_words(words):
-    count = 0
-    for word in words:
-        if len(word) > 6:
-            count += 1
 
+#kollar ifall orden är större än 6 tecken
+def long_words(word_counts):
+    count = 0
+    for word, amount in word_counts.items():
+        if len(word) > 6:
+            count += amount
     return count
+
+
 #kollar alla bokstäver
 def amount_letters(line, letter_counter):
     for ch in line.lower():
@@ -134,6 +137,7 @@ def amount_letters(line, letter_counter):
                 letter_counter[ch] += 1
             else:
                 letter_counter[ch] = 1
+
 
 #räknar alla skiljetecken
 def count_punctuation(line):
@@ -146,14 +150,14 @@ def count_punctuation(line):
     return count
 #räknar antal nummer
 
+
 def digits(line):
     count = 0
-
-    line.split()
     for dig in line:
         if dig.isdigit():
             count += 1
     return count
+
 
 #räknar tecken som inte är bokstäver, siffror, mellanslag eller Skiljetecken
 def other_chars(line, other_counter):
@@ -165,6 +169,8 @@ def other_chars(line, other_counter):
                 other_counter[ch] += 1
             else:
                 other_counter[ch] = 1
+
+
 #sparar all data i blocket, kollar också filnamn och ifall resultat har någon data i sig
 def save_section(results, filename, section, data):
     #kollar ifall filen inte finns i resultat. om den inte finns så rensar jag mitt resultat
@@ -212,6 +218,56 @@ def export_txt(results,filename):
     print(f"Results exported to {path}")
 
 
+#Case 1
+def show_file(files):
+    for file in range(len(files)):
+        print(file + 1,files[file])
+
+
+#Case 2
+def basic_stats(stats):
+    long_words = stats["long_words"]
+    sentence_amount = len(stats["sentence"])
+    if sentence_amount != 0:
+        lix = (stats["words"]/sentence_amount) + ((long_words / stats["words"]) * 100)
+    level, description  = lix_level(lix)
+
+    return {
+        "Lines": stats["lines"],
+        "Words": stats["words"],
+        "Characters": stats["chars"],
+        "Characters with spaces": stats["chars_with_spaces"],
+        "Average words per line": round(stats["avg_wpl"], 1),
+        "Average characters per word": round(stats["avg_cpw"], 1),
+        "LIX": round(lix, 1),
+        "LIX level": level,
+        "LIX description": description
+    }
+
+def lix_level(lix):
+    if 0 <= lix <= 24:
+        return "Very easy", "Suitable for children's books or simple texts."
+    elif 25 <= lix <= 34:
+        return "Easy", "Suitable for a general audience with basic reading skills."
+    elif 35 <= lix <= 44:
+        return "Medium", "Typical readability for novels or newspapers."
+    elif 45 <= lix <= 54:
+        return "Difficult", "Suitable for academic texts or technical documents."
+    elif lix <= 55:
+        return "Very difficult", "Suitable for specialized literature or scientific papers"
+
+def print_basic_stats(base_stats):
+    print("Total number of lines: ",base_stats["Lines"])
+    print("Total number of words: ",base_stats["Words"])
+    print("Total number of characters without spaces",base_stats["Characters"])
+    print("Total number of characters with spaces", base_stats["Characters with spaces"])
+    print("Average words per line:", round(base_stats["Average words per line"]))
+    print("Average characters per word: ",round(base_stats["Average characters per word"]))
+    if base_stats["LIX"] > 0:
+        print(f"LIX: {base_stats["LIX"]} ({base_stats["LIX level"]})")
+        print("Typical texts: ", base_stats["LIX description"])
+
+
 #Skapar grafen för basic stats
 def vis_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl, avg_cpw):
     #delar upp grafen i två delar så att man kan se de olika värdena
@@ -228,6 +284,76 @@ def vis_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl,
     plt.show()
 
 
+#CASE 3
+def word_analysis(stats):
+    #Gör min word_counts till två variabler så jag kan använda både key och value
+    items = [(count, word) for word, count in stats ["word_counts"].items()]
+    items.sort(reverse=True)
+    appea_once = 0
+
+    for count, word in items:
+        if count == 1:
+            appea_once += 1
+
+    #Hämtar alla ord som har bokstäver i sig så jag kan kolla vilka som är störst o minst 
+    letter_words = [word for word in stats["word_counts"] if word.isalpha()]
+    #sparar all data
+    return {
+        "Unique words": len(stats["word_counts"]),
+        "Word appearing only once" : appea_once,
+        "Longest word": max(letter_words, key=len),
+        "Shortest word": min(letter_words, key=len),
+        "top_10": items[:10] 
+    }
+
+
+def print_word_analysis(word_data,total_words):
+    print("Top 10 most common words")
+    #Skriver ut mina top 10, har tre values "place", "Count", "Word" sen placerar jag ut dem. "place" funkar pga enumerate som får ett värde
+    for place,(count,word) in enumerate(word_data["top_10"], start=1):
+        percent = count / total_words * 100
+        print(f"{place:>2}. {word:<12} {count:>7,} times ({percent:>4.1f}%)")
+    #Printar all data utöver top 10
+    print("Unique words:", word_data["Unique words"])
+    print("Words appearing only once:", word_data["Word appearing only once"])
+    print("Longest word:", word_data["Longest word"])
+    print("Shortest word:", word_data["Shortest word"])
+
+
+#Case 5
+
+def Character_analysis(stats):
+    letters = [(letter_count, letter) for letter , letter_count in stats["letter_counter"].items()]
+    letters.sort(reverse=True)
+    total_chars = stats["chars_with_spaces"]
+    letter_total = sum(stats["letter_counter"].values())
+    spaces = total_chars - stats["chars"]
+    digit_total = stats["digits"]
+    punct_total = stats["punctuation"]
+    other_total = sum(stats["other"].values())
+
+    return {
+        "Total characters": total_chars,
+        "Letters": letter_total,
+        "Digits": digit_total,
+        "Spaces": spaces,
+        "Punctuation": punct_total,
+        "Other": other_total,
+        "Top_10": letters[:10]
+    }
+
+def print_Character_analysis(char_analysis):
+    print("Character type distribution:")
+    print(f"Letters:     {char_analysis["Letters"]:<8} ({char_analysis["Letters"] / char_analysis["Total characters"] * 100:.1f}%)")
+    print(f"Digits:      {char_analysis["Digits"]:<8} ({char_analysis["Digits"] / char_analysis["Total characters"] * 100:.1f}%)")
+    print(f"Spaces:      {char_analysis["Spaces"]:<8} ({char_analysis["Spaces"] / char_analysis["Total characters"] * 100:.1f}%)")
+    print(f"Punctuation: {char_analysis["Punctuation"]:<8} ({char_analysis["Punctuation"] / char_analysis["Total characters"] * 100:.1f}%)")
+    print(f"Other:       {char_analysis["Other"]:<8} ({char_analysis["Other"] / char_analysis["Total characters"] * 100:.1f}%)")
+    print("Other characters found:", char_analysis["Other"])    
+
+    for place,(count,char) in enumerate(char_analysis["Top_10"], start=1):
+        percent = count / char_analysis["Total characters"] * 100
+        print(f"{place:>2}. {char:<12} {count:>7,} times ({percent:>4.1f}%)")
 
 
 def main():
@@ -262,8 +388,7 @@ def main():
             case 1:
                 files = get_files()
                 print("files available: ")
-                for file in range(len(files)):
-                    print(file + 1,files[file])
+                show_file(files)
                 filename = load_file(files)
                 if filename is not None:
                     stats = file_reader(filename)
@@ -272,114 +397,38 @@ def main():
             case 2 | 3 | 4 | 5 | 6 if filename is None:
                 print("No file is loaded. Pick 1 to load a file")
             case 2:
+                #går igenom alla basestats och sparar det som behövs
+                base_stats = basic_stats(stats)
+                
                 #Printar alla värden jag vill visa i basic stats
-                print("Total number of lines: ",stats["lines"])
-                print("Total number of words: ",stats["words"])
-                print("Total number of characters without spaces",stats["chars"])
-                print("Total number of characters with spaces", stats["chars_with_spaces"])
-                print("Average words per line:", round(stats["avg_wpl"]))
-                print("Average characters per word: ",round(stats["avg_cpw"]))
+                print_basic_stats(base_stats)
 
-                sentence_amount = len(stats["sentence"])
-                long_words = stats["long_words"]
-                lix = (stats["words"]/sentence_amount) + ((long_words / stats["words"]) * 100)
-                print(round(lix , 1))
                 #skickar all data om "basic stats"
-                results = save_section(results, filename, "Basic statistics", {
-                "Lines": stats["lines"],
-                "Words": stats["words"],
-                "Characters": stats["chars"],
-                "Characters with spaces": stats["chars_with_spaces"],
-                "Average words per line": round(stats["avg_wpl"], 1),
-                "Average characters per word": round(stats["avg_cpw"], 1)
-            })
+                results = save_section(results, filename, "Basic statistics", base_stats)
+
                 input("Press Enter to open graph...")
+
                 #skapar en graf
                 vis_graph(filename, stats["lines"],stats["words"],stats["chars"],stats["chars_with_spaces"],stats["avg_wpl"],stats["avg_cpw"])
 
                 input("Press Enter to continue...")
-            case 3:
-                appear_once = 0
-                #delar upp de olika delarna i mitt set så jag kan lätt skriva ut dem
-                items = [(count, word) for word, count in stats["word_counts"].items()]
-                #Sorterar så störst är först i nummering
-                items.sort(reverse=True)
-                total = stats["words"]
-                #kollar ifall ordet är en bokstav
-                letter_words = [word for word in stats["word_counts"] if word.isalpha()]
-                #Hämtar största och minsta ordet
-                longest = max(letter_words, key=len)
-                shortest = min(letter_words, key=len)
-                #sparar lite utan datan som vi ska skriva ut
-                word_data = {
-                    "Unique words": len(stats["word_counts"]),
-                    "Words appearing only once": appear_once,
-                    "Longset word": longest,
-                    "Shortest word": shortest
-                }
-                print(f"Longest word: {longest} ({len(longest)} characters)")
-                print(f"Shortest word: {shortest} ({len(shortest)} characters)")
-                print("Top 10 most common words:")
-                #Delar upp min "items" i två delar men jag numrerar den också så jag kan skriva ut vilken plats den är på.
-                for place, (count, word) in enumerate(items[:10], start=1):
-                    #räknar ut % hur vanlig varje TOP 10 ord är.
-                    percent = count / total * 100
-                    print(f"{place:>2}. {word:<12} {count:>7,} times ({percent:>4.1f}%)")
-                    #lägger in min tabel om vanligaste orden i min data som skickas till resultat.
-                    word_data[f"{place:>2}. {word:<12}"] = f"{count:>7,} times ({percent:>4.1f}%)"
-                print(len(stats["word_counts"]))
-                #kollar vilka ord som endast kommer fram en gång.
-                for count, word in items:
-                    if count == 1:
-                        appear_once += 1
-                print(appear_once)
 
-                #sparar all data från case 3
-                results = save_section(results, filename, "Word analysis", word_data)
-                
+            case 3:
+                word_data = word_analysis(stats)
+                print_word_analysis(word_data,stats["words"])
+                results = save_section(results,filename,"Word analysis",word_data)
                 input("Press Enter to continue...")
             case 4:
                 print("4")
                 input("Press Enter to continue...")
             case 5:
-                letters = [(letter_count, letter) for letter , letter_count in stats["letter_counter"].items()]
-                letters.sort(reverse=True)
+                #Går igenom all "character analysis" som behövs för att få rätt data
+                char_analysis = Character_analysis(stats)
+                #Printar min data
+                print_Character_analysis(char_analysis)
+                #sparar ner all min data i min "results" variabel
+                results = save_section(results, filename, "Character analysis", char_analysis)
 
-                total_chars = stats["chars_with_spaces"]
-                letter_total = sum(stats["letter_counter"].values())
-                spaces = total_chars - stats["chars"]
-                digit_total = stats["digits"]
-                punct_total = stats["punctuation"]
-                other_total = sum(stats["other"].values())
-                print("Character type distribution:")
-                print(f"Letters:     {letter_total:<8} ({letter_total / total_chars * 100:.1f}%)")
-                print(f"Digits:      {digit_total:<8} ({digit_total / total_chars * 100:.1f}%)")
-                print(f"Spaces:      {spaces:<8} ({spaces / total_chars * 100:.1f}%)")
-                print(f"Punctuation: {punct_total:<8} ({punct_total / total_chars * 100:.1f}%)")
-                print(f"Other:       {other_total:<8} ({other_total / total_chars * 100:.1f}%)")
-                print("Other characters found:", stats["other"])
-
-                #sparar lite av datan som vi ska skriva ut
-                char_data = {
-                    "Total characters": total_chars,
-                    "Letters": f"{letter_total:<8} ({letter_total / total_chars * 100:.1f}%)",
-                    "Digits": f"{digit_total:<8} ({digit_total / total_chars * 100:.1f}%)",
-                    "Spaces": f"{spaces:<8} ({spaces / total_chars * 100:.1f}%)",
-                    "Punctuation": f"{punct_total:<8} ({punct_total / total_chars * 100:.1f}%)",
-                    "Other": f"{other_total:<8} ({other_total / total_chars * 100:.1f}%)"
-                }
-
-                print("Most common letters(top 10)")
-                for place, (letter_count, letter) in enumerate(letters[:10], start=1):
-                    percent_letters = letter_count / stats["chars"] * 100
-                    print(f"{place:>2}. {letter:<12} {letter_count:>7,} times ({percent_letters:>4.1f}%)")
-                    char_data[f"{place:>2}. {letter}"] = f"{letter_count:>7,} times ({percent_letters:>4.1f}%)"
-
-
-
-
-                #sparar all data från case 5
-                results = save_section(results, filename, "Character analysis", char_data)
                 input("Press Enter to continue...")
 
 
