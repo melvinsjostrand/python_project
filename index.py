@@ -36,7 +36,8 @@ def file_reader(filename):
     "chars_with_spaces": 0,
     "word_counts": {},
     "letter_counter":{},
-    "sentence": []
+    "sentence": [],
+    "digits": 0
     }
     current = "" #buffert till sentence funktionen
 
@@ -56,7 +57,12 @@ def file_reader(filename):
         word_count(line,stats["word_counts"])
         #sparar i bufferten
         current = sentence(line, current, stats["sentence"])
+<<<<<<< Updated upstream
         amount_letters(line,stats["letter_counter"])
+=======
+        most_common_letter(line,stats["letter_counter"])
+        stats["digits"] += digits(line)
+>>>>>>> Stashed changes
     #Det som blev över när filen tog slut.
     if current.strip():
         stats["sentence"].append(current.strip())
@@ -94,7 +100,7 @@ def words(line):
     return len(line.split())
 
 def chars_with_space(line):
-    return len(line.rstrip("\n").replace(" ", ""))
+    return len(line.rstrip("\n"))
 
 #Hämtar alla karaktärer på raden
 def chars(line):
@@ -167,12 +173,29 @@ def export_txt(results,filename):
 def amount_letters(line,letter_counter):
     line = line.split()
     for word in line:
+<<<<<<< Updated upstream
         if word.isalpha():
             for ch in word:
                 if ch in letter_counter:
                     letter_counter[ch] += 1
                 else:
                     letter_counter[ch] = 1
+=======
+        for ch in word:
+            if ch in letter_counter:
+                letter_counter[ch] += 1
+            else:
+                letter_counter[ch] = 1
+
+def digits(line):
+    count = 0
+    line.split()
+    for dig in line:
+        if dig.isdigit():
+            count += 1
+
+    return count
+>>>>>>> Stashed changes
 def main():
     menu = '''
 ==================================================
@@ -216,7 +239,6 @@ def main():
             case 2 | 3 | 4 | 5 | 6 if filename is None:
                 print("No file is loaded. Pick 1 to load a file")
             case 2:
-                
                 #Printar alla värden jag vill visa i basic stats
                 print("Total number of lines: ",stats["lines"])
                 print("Total number of words: ",stats["words"])
@@ -281,11 +303,25 @@ def main():
                 print("4")
                 input("Press Enter to continue...")
             case 5:
+<<<<<<< Updated upstream
                 letters = [(letter_count, letter) for letter , letter_count in stats["letter_counter"].items()]
                 letters.sort(reverse=True)
                 for place, (letter_count, letter) in enumerate(letters[:10], start=1):
                     percent_letters = letter_count / stats["chars"] * 100
                     print(f"{place:>2}. {letter:<12} {letter_count:>7,} times ({percent_letters:>4.1f}%)")
+=======
+                print("5")
+                letters = [(count, letters) for letters , count in stats["letter_counter"].items()]
+                #alla spaces
+                print(stats["chars"])
+                print(stats["chars_with_spaces"])
+                total_letters = stats["chars"]
+                letters.sort(reverse=True)
+                #Top 10 vanligaste bokstäverna i texten.
+                for place, (count, letters) in enumerate(letters[:10], start=1):
+                    percent_letters = count / total_letters * 100
+                    print(f"{place:>2}. {letters:<12} {count:>7,} times ({percent_letters:>4.1f}%)")
+>>>>>>> Stashed changes
                 input("Press Enter to continue...")
             case 6:
                 #Skapar en txt fil med all data som man gått igenom.
