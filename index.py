@@ -127,7 +127,7 @@ def amount_letters(line, letter_counter):
             else:
                 letter_counter[ch] = 1
 
-
+#räknar alla skiljetecken
 def count_punctuation(line):
     punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
     count = 0
@@ -137,9 +137,10 @@ def count_punctuation(line):
             count += 1
     return count
 #räknar antal nummer
-def digits(line):
 
+def digits(line):
     count = 0
+
     line.split()
     for dig in line:
         if dig.isdigit():
@@ -149,6 +150,7 @@ def digits(line):
 #räknar tecken som inte är bokstäver, siffror, mellanslag eller Skiljetecken
 def other_chars(line, other_counter):
     punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+
     for ch in line.rstrip("\n"):
         if not (ch.isalpha() or ch.isdigit() or ch == " " or ch in punctuation):
             if ch in other_counter:
@@ -344,13 +346,30 @@ def main():
                 print(f"Other:       {other_total:<8} ({other_total / total_chars * 100:.1f}%)")
                 print("Other characters found:", stats["other"])
 
-
+                #sparar lite av datan som vi ska skriva ut
+                char_data = {
+                    "Total characters": total_chars,
+                    "Letters": f"{letter_total:<8} ({letter_total / total_chars * 100:.1f}%)",
+                    "Digits": f"{digit_total:<8} ({digit_total / total_chars * 100:.1f}%)",
+                    "Spaces": f"{spaces:<8} ({spaces / total_chars * 100:.1f}%)",
+                    "Punctuation": f"{punct_total:<8} ({punct_total / total_chars * 100:.1f}%)",
+                    "Other": f"{other_total:<8} ({other_total / total_chars * 100:.1f}%)"
+                }
 
                 print("Most common letters(top 10)")
                 for place, (letter_count, letter) in enumerate(letters[:10], start=1):
                     percent_letters = letter_count / stats["chars"] * 100
                     print(f"{place:>2}. {letter:<12} {letter_count:>7,} times ({percent_letters:>4.1f}%)")
+                    char_data[f"{place:>2}. {letter}"] = f"{letter_count:>7,} times ({percent_letters:>4.1f}%)"
+
+
+
+
+                #sparar all data från case 5
+                results = save_section(results, filename, "Character analysis", char_data)
                 input("Press Enter to continue...")
+
+
             case 6:
                 #Skapar en txt fil med all data som man gått igenom.
                 export_txt(results,filename)
