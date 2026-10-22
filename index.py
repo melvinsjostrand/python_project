@@ -38,7 +38,8 @@ def file_reader(filename):
     "letter_counter":{},
     "sentence": [],
     "punctuation": 0,
-    "digits": 0
+    "digits": 0,
+    "other": {}
     }
     current = "" #buffert till sentence funktionen
 
@@ -61,6 +62,7 @@ def file_reader(filename):
         amount_letters(line,stats["letter_counter"])
         stats["punctuation"] += count_punctuation(line)
         stats["digits"] += digits(line)
+        other_chars(line, stats["other"])
 
 
 
@@ -117,15 +119,13 @@ def sentence(line, current, sentences):
     return current
 
 #kollar alla bokstäver
-def amount_letters(line,letter_counter):
-    line = line.split()
-    for word in line:
-        if word.isalpha():
-            for ch in word:
-                if ch in letter_counter:
-                    letter_counter[ch] += 1
-                else:
-                    letter_counter[ch] = 1
+def amount_letters(line, letter_counter):
+    for ch in line.lower():
+        if ch.isalpha():
+            if ch in letter_counter:
+                letter_counter[ch] += 1
+            else:
+                letter_counter[ch] = 1
 
 
 def count_punctuation(line):
@@ -138,6 +138,7 @@ def count_punctuation(line):
     return count
 #räknar antal nummer
 def digits(line):
+
     count = 0
     line.split()
     for dig in line:
@@ -145,6 +146,15 @@ def digits(line):
             count += 1
     return count
 
+#räknar tecken som inte är bokstäver, siffror, mellanslag eller Skiljetecken
+def other_chars(line, other_counter):
+    punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+    for ch in line.rstrip("\n"):
+        if not (ch.isalpha() or ch.isdigit() or ch == " " or ch in punctuation):
+            if ch in other_counter:
+                other_counter[ch] += 1
+            else:
+                other_counter[ch] = 1
 #sparar all data i blocket, kollar också filnamn och ifall resultat har någon data i sig
 def save_section(results, filename, section, data):
     #kollar ifall filen inte finns i resultat. om den inte finns så rensar jag mitt resultat
@@ -319,6 +329,24 @@ def main():
             case 5:
                 letters = [(letter_count, letter) for letter , letter_count in stats["letter_counter"].items()]
                 letters.sort(reverse=True)
+
+                total_chars = stats["chars_with_spaces"]
+                letter_total = sum(stats["letter_counter"].values())
+                spaces = total_chars - stats["chars"]
+                digit_total = stats["digits"]
+                punct_total = stats["punctuation"]
+                other_total = sum(stats["other"].values())
+                print("Character type distribution:")
+                print(f"Letters:     {letter_total:<8} ({letter_total / total_chars * 100:.1f}%)")
+                print(f"Digits:      {digit_total:<8} ({digit_total / total_chars * 100:.1f}%)")
+                print(f"Spaces:      {spaces:<8} ({spaces / total_chars * 100:.1f}%)")
+                print(f"Punctuation: {punct_total:<8} ({punct_total / total_chars * 100:.1f}%)")
+                print(f"Other:       {other_total:<8} ({other_total / total_chars * 100:.1f}%)")
+                print("Other characters found:", stats["other"])
+
+
+
+                print("Most common letters(top 10)")
                 for place, (letter_count, letter) in enumerate(letters[:10], start=1):
                     percent_letters = letter_count / stats["chars"] * 100
                     print(f"{place:>2}. {letter:<12} {letter_count:>7,} times ({percent_letters:>4.1f}%)")
