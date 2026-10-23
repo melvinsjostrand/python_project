@@ -53,8 +53,17 @@ def file_reader(filename):
 
 
     file = open(filename, "r", encoding="utf-8")
+    inside_book = True
     #går igenom hela filen rad för rad
     for line in file:
+        if "*** START OF" in line:
+            inside_book = True
+            reset_stats(stats)
+            continue
+        if "*** END OF" in line:
+            break
+        if not inside_book:
+            continue
         #lägger ihop alla ord
         stats["words"] += words(line)
         #lägger ihop alla karaktärer med spaces jag hämtar
@@ -86,7 +95,17 @@ def file_reader(filename):
     stats["avg_cpw"] = stats["chars"] / stats["words"] if stats["words"] > 0 else 0
     return stats
 
-
+def reset_stats(stats):
+    stats["lines"] = 0
+    stats["words"] = 0
+    stats["chars"] = 0
+    stats["chars_with_spaces"] = 0
+    stats["punctuation"] = 0
+    stats["digits"] = 0
+    stats["word_counts"].clear()
+    stats["letter_counter"].clear()
+    stats["sentence"].clear()
+    stats["other"].clear()
 #hämtar alla ord jag har på en line       
 def words(line):
     return len(line.split())
