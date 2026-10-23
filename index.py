@@ -42,7 +42,8 @@ def file_reader(filename):
                  "longest_words": 0,
                  "shortest": "",
                  "shortest_words": 0,
-                 "distribution": {"1-5"}},
+                 "distribution":  {"1-5": 0, "6-10": 0, "11-20": 0, "21-30": 0, "31+": 0}
+                 }
     "punctuation": 0,
     "digits": 0,
     "other": {},
