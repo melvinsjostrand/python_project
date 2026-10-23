@@ -26,8 +26,6 @@ Other information and formats: www.gutenberg.org/ebooks/2554
 Credits: John Bickers, Dagny and David Widger
 
 
-*** START OF THE PROJECT GUTENBERG EBOOK CRIME AND PUNISHMENT ***
-
 
 
 
@@ -107,7 +105,7 @@ CONTENTS
     EPILOGUE
 
 
-
+*** START OF THE PROJECT GUTENBERG EBOOK CRIME AND PUNISHMENT ***
 
 TRANSLATOR’S PREFACE
 

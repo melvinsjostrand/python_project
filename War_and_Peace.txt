@@ -27,8 +27,6 @@ Other information and formats: www.gutenberg.org/ebooks/2600
 Credits: An Anonymous Volunteer and David Widger
 
 
-*** START OF THE PROJECT GUTENBERG EBOOK WAR AND PEACE ***
-
 
 
 
@@ -832,6 +830,8 @@ By Leo Tolstoy/Tolstoi
 BOOK ONE: 1805
 
 
+
+*** START OF THE PROJECT GUTENBERG EBOOK WAR AND PEACE ***
 
 
 

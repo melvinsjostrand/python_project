@@ -24,7 +24,6 @@ Other information and formats: www.gutenberg.org/ebooks/345
 Credits: Chuck Greif and the Online Distributed Proofreading Team
 
 
-*** START OF THE PROJECT GUTENBERG EBOOK DRACULA ***
 
 
 
@@ -95,7 +94,7 @@ CHAPTER XXVI. Dr. Seward’s Diary
 CHAPTER XXVII. Mina Harker’s Journal
 
 
-
+*** START OF THE PROJECT GUTENBERG EBOOK DRACULA ***
 
 How these papers have been placed in sequence will be made manifest in
 the reading of them. All needless matters have been eliminated, so that

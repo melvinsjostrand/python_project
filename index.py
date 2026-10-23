@@ -43,7 +43,7 @@ def file_reader(filename):
                  "shortest": "",
                  "shortest_words": 0,
                  "distribution":  {"1-5": 0, "6-10": 0, "11-20": 0, "21-30": 0, "31+": 0}
-                 }
+                 },
     "punctuation": 0,
     "digits": 0,
     "other": {},
@@ -59,6 +59,7 @@ def file_reader(filename):
         if "*** START OF" in line:
             inside_book = True
             reset_stats(stats)
+            current = ""
             continue
         if "*** END OF" in line:
             break
@@ -76,9 +77,7 @@ def file_reader(filename):
         word_count(line,stats["word_counts"])
         #sparar i bufferten
         current = sentence(line, current, stats["sentence"])
-        if current.stirp():
-            add_sentence(curremt.strip(),stats["sentence"])
-
+        
         amount_letters(line,stats["letter_counter"])
         stats["punctuation"] += count_punctuation(line)
         stats["digits"] += digits(line)
@@ -89,7 +88,7 @@ def file_reader(filename):
 
     #Det som blev över när filen tog slut.
     if current.strip():
-        stats["sentence"].append(current.strip())
+        add_sentence(current.strip(), stats["sentence"])
     
     stats["avg_wpl"] = stats["words"] / stats["lines"] if stats["lines"] > 0 else 0
     stats["avg_cpw"] = stats["chars"] / stats["words"] if stats["words"] > 0 else 0
@@ -104,8 +103,16 @@ def reset_stats(stats):
     stats["digits"] = 0
     stats["word_counts"].clear()
     stats["letter_counter"].clear()
-    stats["sentence"].clear()
     stats["other"].clear()
+    stats["sentence"].update({
+        "count": 0,
+        "total_words": 0,
+        "longest": "",
+        "longest_words": 0,
+        "shortest": "",
+        "shortest_words": 0,
+        "distribution": {"1-5": 0, "6-10": 0, "11-20": 0, "21-30": 0, "31+": 0}
+     })
 #hämtar alla ord jag har på en line       
 def words(line):
     return len(line.split())
@@ -137,15 +144,26 @@ def word_count(line,word_count):
 
 
 #Går igenom en "line" och kollar när det finns ett slut
-def sentence(line, current, sentences):
+def sentence(line, current, sentence_stats):
     line = line.strip()
-    for i in range(len(line)):
-        current += line[i]
-        if line[i] in ".!?":
-            if i + 1 == len(line) or line[i+1] == " ":#Kollar nästa line och sen om det verkligen är slut
-                add_sentence.append(current.strip(), sentence_stats)
-                current=""
-    current += " "#lägger till space efter den har gått igenom en "line"
+    closing = "”’’”)"
+    i = 0
+    while i < len(line):
+        char = line[i]
+        current += char
+
+        if char in ".!?":
+            #tar med stängande citattecken direkt efter punkten
+            while i + 1 < len(line) and line[i + 1] in closing:
+                i += 1
+                current += line[i]
+            #meningen är slut om raden tar slut eller ett mellanslag kommer
+            if i + 1 == len(line) or line[i + 1] == " ":
+                add_sentence(current.strip(), sentence_stats)
+                current = ""
+        i += 1
+
+    current += " "
     return current
 
 def add_sentence(text,s):
@@ -156,7 +174,51 @@ def add_sentence(text,s):
     s["count"] += 1
     s["total_words"] += word_amount
 
-    if word_amount > s[]
+    if word_amount > s["longest_words"]:
+        s["longest"] = text
+        s["longest_words"] = word_amount
+    if s["shortest_words"] == 0 or word_amount < s["shortest_words"]:
+        s["shortest"] = text
+        s["shortest_words"] = word_amount
+
+    s["distribution"][length_group(word_amount)] += 1
+
+
+def length_group(n):
+    if n <= 5:
+        return "1-5"
+    elif n <= 10:
+        return "6-10"
+    elif n <= 20:
+        return "11-20"
+    elif n <= 30:
+        return "21-30"
+    return "31+"
+
+def count_sentences(s):
+    return s["count"]
+
+def avg_words_per_sentence(s):
+    if s["count"] > 0:
+        return s["total_words"] / s["count"]
+    else:
+        return None
+
+def sentence_analysis(stats):
+    s = stats["sentence"]
+    if s["count"] == 0:
+        return None
+
+    return {
+        "Sentences": count_sentences(s),
+        "Average words per sentence": round(avg_words_per_sentence(s), 1),
+        "Longest sentence": s["longest"],
+        "Longest sentence (words)": s["longest_words"],
+        "Shortest sentence": s["shortest"],
+        "Shortest sentence (words)": s["shortest_words"],
+        "Length distribution": s["distribution"]
+    }
+    
 
 
 #kollar ifall orden är större än 6 tecken
@@ -262,11 +324,11 @@ def show_file(files):
     for file in range(len(files)):
         print(file + 1,files[file])
 
-"""
+
 #Case 2
 def basic_stats(stats):
     long_words = stats["long_words"]
-    sentence_amount = len(stats["sentence"])
+    sentence_amount = count_sentences(stats["sentence"])
     if sentence_amount != 0:
         lix = (stats["words"]/sentence_amount) + ((long_words / stats["words"]) * 100)
     level, description  = lix_level(lix)
@@ -292,7 +354,7 @@ def lix_level(lix):
         return "Medium", "Typical readability for novels or newspapers."
     elif 45 <= lix <= 54:
         return "Difficult", "Suitable for academic texts or technical documents."
-    elif lix <= 55:
+    elif lix >= 55:
         return "Very difficult", "Suitable for specialized literature or scientific papers"
 
 def print_basic_stats(base_stats):
@@ -322,7 +384,7 @@ def vis_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl,
     plt.tight_layout()
     plt.show()
 
-"""
+
 #CASE 3
 def word_analysis(stats):
     #Gör min word_counts till två variabler så jag kan använda både key och value
@@ -360,9 +422,17 @@ def print_word_analysis(word_data,total_words):
 
 #Case 4
 
-
-
-
+def print_sentence_analysis(data):
+    total = data["Sentences"]
+    print("Total number of sentences:", total)
+    print("Average words per sentence:", data["Average words per sentence"])
+    print(f"Longest sentence ({data['Longest sentence (words)']} words):")
+    print(" ", data["Longest sentence"])
+    print(f"Shortest sentence ({data['Shortest sentence (words)']} words):")
+    print(" ", data["Shortest sentence"])
+    print("Sentence length distribution (words):")
+    for interval, count in data["Length distribution"].items():
+        print(f"{interval:>6}: {count:>6} ({count / total * 100:>4.1f}%)")
 
 #Case 5
 
@@ -463,7 +533,12 @@ def main():
                 results = save_section(results,filename,"Word analysis",word_data)
                 input("Press Enter to continue...")
             case 4:
-               
+                sentence_data = sentence_analysis(stats)
+                if sentence_data is None:
+                    print("No sentences found.")
+                else:
+                    print_sentence_analysis(sentence_data)
+                    results = save_section(results, filename, "Sentence analysis", sentence_data)
 
                 
                 input("Press Enter to continue...")

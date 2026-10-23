@@ -24,7 +24,7 @@ Other information and formats: www.gutenberg.org/ebooks/1342
 Credits: Chuck Greif and the Online Distributed Proofreading Team at http://www.pgdp.net (This file was produced from images available at The Internet Archive)
 
 
-*** START OF THE PROJECT GUTENBERG EBOOK PRIDE AND PREJUDICE ***
+
 
 
 
@@ -90,7 +90,7 @@ Credits: Chuck Greif and the Online Distributed Proofreading Team at http://www.
                                    ]
 
 
-
+*** START OF THE PROJECT GUTENBERG EBOOK PRIDE AND PREJUDICE ***
 
 PREFACE.
 
