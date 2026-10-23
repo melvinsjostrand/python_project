@@ -36,7 +36,13 @@ def file_reader(filename):
     "chars_with_spaces": 0,
     "word_counts": {},
     "letter_counter":{},
-    "sentence": [],
+    "sentence": {"count": 0,
+                 "total_words": 0,
+                 "longest": "",
+                 "longest_words": 0,
+                 "shortest": "",
+                 "shortest_words": 0,
+                 "distribution": {"1-5"}},
     "punctuation": 0,
     "digits": 0,
     "other": {},
@@ -60,6 +66,9 @@ def file_reader(filename):
         word_count(line,stats["word_counts"])
         #sparar i bufferten
         current = sentence(line, current, stats["sentence"])
+        if current.stirp():
+            add_sentence(curremt.strip(),stats["sentence"])
+
         amount_letters(line,stats["letter_counter"])
         stats["punctuation"] += count_punctuation(line)
         stats["digits"] += digits(line)
@@ -112,12 +121,22 @@ def sentence(line, current, sentences):
     line = line.strip()
     for i in range(len(line)):
         current += line[i]
-        if line[i] in ".!?": #Letar efter skilljetecken
-            if i + 1 == len(line) or line[i+1] == " ":# kollar om en mening verkligen är slut. 
-                sentences.append(current.strip())
+        if line[i] in ".!?":
+            if i + 1 == len(line) or line[i+1] == " ":#Kollar nästa line och sen om det verkligen är slut
+                add_sentence.append(current.strip(), sentence_stats)
                 current=""
     current += " "#lägger till space efter den har gått igenom en "line"
     return current
+
+def add_sentence(text,s):
+    word_amount = len(text.split())
+    if word_amount == 0:
+        return
+
+    s["count"] += 1
+    s["total_words"] += word_amount
+
+    if word_amount > s[]
 
 
 #kollar ifall orden är större än 6 tecken
@@ -223,7 +242,7 @@ def show_file(files):
     for file in range(len(files)):
         print(file + 1,files[file])
 
-
+"""
 #Case 2
 def basic_stats(stats):
     long_words = stats["long_words"]
@@ -283,7 +302,7 @@ def vis_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl,
     plt.tight_layout()
     plt.show()
 
-
+"""
 #CASE 3
 def word_analysis(stats):
     #Gör min word_counts till två variabler så jag kan använda både key och value
@@ -318,6 +337,11 @@ def print_word_analysis(word_data,total_words):
     print("Words appearing only once:", word_data["Word appearing only once"])
     print("Longest word:", word_data["Longest word"])
     print("Shortest word:", word_data["Shortest word"])
+
+#Case 4
+
+
+
 
 
 #Case 5
@@ -419,7 +443,9 @@ def main():
                 results = save_section(results,filename,"Word analysis",word_data)
                 input("Press Enter to continue...")
             case 4:
-                print("4")
+               
+
+                
                 input("Press Enter to continue...")
             case 5:
                 #Går igenom all "character analysis" som behövs för att få rätt data
