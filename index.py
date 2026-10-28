@@ -471,6 +471,26 @@ def print_sentence_analysis(data):
     for interval, count in data["Length distribution"].items():
         print(f"{interval:>6}: {count:>6} ({count / total * 100:>4.1f}%)")
 
+def case4_chart(data):
+    total = data["Sentences"]
+    precent = []
+    senlen = []
+    intervals = []
+    explode = (0.2, 0, 0, 0, 0)
+    colors = ['limegreen','darkorange','lightcoral','peachpuff','darkseagreen','palevioletred']
+
+    for interval, count in data["Length distribution"].items():
+            precent.append(f"{count / total * 100:>4.1f}%)")
+            senlen.append(count)
+            intervals.append(interval)
+
+   
+
+
+    plt.pie(senlen, labels=intervals, autopct='%10.0f%%', shadow=True, explode=explode, startangle=180, colors=colors)
+    plt.title("Sentence length distribution (words)")
+    plt.show()
+
 #Case 5
 
 def Character_analysis(stats):
@@ -584,8 +604,11 @@ def main():
                 else:
                     print_sentence_analysis(sentence_data)
                     results = save_section(results, filename, "Sentence analysis", sentence_data)
+                    
+                input("Press Enter to open graph...")
 
-                
+                case4_chart(sentence_data)
+
                 input("Press Enter to continue...")
             case 5:
                 #Går igenom all "character analysis" som behövs för att få rätt data
