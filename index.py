@@ -135,7 +135,7 @@ def chars(line):
 def word_count(line,word_count):
     line = line.lower().split()
     for word in line:
-        word = word.strip(".,!?;:""()--_'\"")
+        word = word.strip(".,!?;:()-_'\"“”‘’")
         if word:
             if word in word_count:
                 word_count[word] += 1
@@ -146,7 +146,7 @@ def word_count(line,word_count):
 #Går igenom en "line" och kollar när det finns ett slut
 def sentence(line, current, sentence_stats):
     line = line.strip()
-    closing = "”’’”)"
+    closing = "\"'”’)"
     i = 0
     while i < len(line):
         char = line[i]
@@ -339,9 +339,10 @@ def show_file(files):
 def basic_stats(stats):
     long_words = stats["long_words"]
     sentence_amount = count_sentences(stats["sentence"])
+    lix = 0
     if sentence_amount != 0:
         lix = (stats["words"]/sentence_amount) + ((long_words / stats["words"]) * 100)
-    level, description  = lix_level(lix)
+    level, description  = lix_level(round(lix))
 
     return {
         "Lines": stats["lines"],
@@ -380,17 +381,21 @@ def print_basic_stats(base_stats):
 
 
 #Skapar grafen för basic stats
-def base_stats_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl, avg_cpw):
+def base_stats_graph(filename, base_stats):
     #delar upp grafen i två delar så att man kan se de olika värdena
     fig, (left, right) = plt.subplots(1, 2, figsize=(12, 5))
-    fig.suptitle("Basic statistics for:" + filename, fontweight="bold")    
-    plt.ylabel("Count")
+    fig.suptitle("Basic statistics for: " + filename, fontweight="bold")
     #Gör min vänsta och högra graf. väljer färg.
-    right.bar(["Words per line", "Characters per word"], [avg_wpl, avg_cpw],
-          color=["gold", "plum"])
-    left.bar(["Lines", "Words", "Characters", "Characters and spaces"], [lines, words, characters, characters_with_spaces],
-         color=["skyblue", "lightgreen", "lightcoral", "purple"])
-
+    averages = right.barh(["Words per line", "Characters per word"],[base_stats["Average words per line"], base_stats["Average characters per word"]],color=["gold", "plum"])
+    right.bar_label(averages, padding=5)
+    right.set_title("Averages")
+    right.set_xlabel("Average")
+    right.set_xlim(0, max(base_stats["Average words per line"], base_stats["Average characters per word"]) * 1.2)
+    left.bar(["Lines", "Words", "Characters", "Characters and spaces"],
+    [base_stats["Lines"], base_stats["Words"], base_stats["Characters"], base_stats["Characters with spaces"]],
+    color=["skyblue", "lightgreen", "lightcoral", "purple"])
+    left.set_ylabel("Count")
+    left.tick_params(axis="x", labelrotation=20)
     plt.tight_layout()
     plt.show()
 
@@ -449,12 +454,13 @@ def case3_charts(total_words,stats):
     for i in range(len(labels)):
         label.append(f"{labels[i]} ({percent[i]}%)")
     
-    
+    plt.figure(figsize=(12, 6))
     plt.bar(labels, amount, label=label, color=colors)
     plt.title('Top 10 words')
     plt.xlabel('The words')
     plt.ylabel('Amount of time in text')
-    plt.legend()
+    plt.legend(loc="upper left", bbox_to_anchor=(1.02, 1))
+    plt.subplots_adjust(right=0.75)
     plt.show()
 
 #Case 4
@@ -523,7 +529,7 @@ def print_Character_analysis(char_analysis):
     print("Other characters found:", char_analysis["Other"])    
 
     for place,(count,char) in enumerate(char_analysis["top_10"], start=1):
-        percent = count / char_analysis["Total characters"] * 100
+        percent = count / char_analysis["Letters"] * 100
         print(f"{place:>2}. {char:<12} {count:>7,} times ({percent:>4.1f}%)")
 
 def case5_charts(char_analysis,filename):
@@ -608,7 +614,7 @@ def main():
                 input("Press Enter to open graph...")
 
                 #skapar en graf
-                base_stats_graph(filename, stats["lines"],stats["words"],stats["chars"],stats["chars_with_spaces"],stats["avg_wpl"],stats["avg_cpw"])
+                base_stats_graph(filename, base_stats)
 
                 input("Press Enter to continue...")
 
@@ -650,6 +656,8 @@ def main():
             case 6:
                 #Skapar en txt fil med all data som man gått igenom.
                 export_txt(results,filename)
+                print("EXPORT DONE, FIND THE EXPORT IN THE RESULT FILE")
+                input("Press Enter to continue...")
             case 7:
                 #Avslutar programmet genom att sätta min "running" som false
                 print("Thank you for using Text Analyser!")
