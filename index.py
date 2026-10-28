@@ -308,8 +308,18 @@ def export_txt(results,filename):
             file.write("-" * 30 + "\n")
             #Delar upp min data så jag får mitt keyValue och mitt själva värde
             for key, value in data.items():
-                file.write(f"{key}: {value}\n")
-            file.write("\n")
+                #skriver ut top 10 som en snygg lista
+                if key in ("top_10", "Top_10"):
+                    file.write("Top 10:\n")
+                    for place, (count, item) in enumerate(value, start=1):
+                        file.write(f"{place:>2}. {item:<12} {count:>7,} times\n")
+                #skriver ut meningsfördelningen rad för rad
+                elif key == "Length distribution":
+                    file.write("Length distribution:\n")
+                    for interval, count in value.items():
+                        file.write(f"{interval:>6}: {count:>6}\n")
+                else:
+                    file.write(f"{key}: {value}\n")
 
     file.write("=" * 60 + "\n")
     file.write("End of Analysis Report\n")
@@ -370,7 +380,7 @@ def print_basic_stats(base_stats):
 
 
 #Skapar grafen för basic stats
-def vis_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl, avg_cpw):
+def base_stats_graph(filename, lines, words, characters,characters_with_spaces,avg_wpl, avg_cpw):
     #delar upp grafen i två delar så att man kan se de olika värdena
     fig, (left, right) = plt.subplots(1, 2, figsize=(12, 5))
     fig.suptitle("Basic statistics for:" + filename, fontweight="bold")    
@@ -400,7 +410,7 @@ def word_analysis(stats):
     letter_words = [word for word in stats["word_counts"] if word.isalpha()]
     #sparar all data
     return {
-        "Unique words": len(stats["word_counts"]),
+        "Unique words": len(set(stats["word_counts"])),
         "Word appearing only once" : appea_once,
         "Longest word": max(letter_words, key=len),
         "Shortest word": min(letter_words, key=len),
@@ -453,7 +463,7 @@ def Character_analysis(stats):
         "Spaces": spaces,
         "Punctuation": punct_total,
         "Other": other_total,
-        "Top_10": letters[:10]
+        "top_10": letters[:10]
     }
 
 def print_Character_analysis(char_analysis):
@@ -523,7 +533,7 @@ def main():
                 input("Press Enter to open graph...")
 
                 #skapar en graf
-                vis_graph(filename, stats["lines"],stats["words"],stats["chars"],stats["chars_with_spaces"],stats["avg_wpl"],stats["avg_cpw"])
+                base_stats_graph(filename, stats["lines"],stats["words"],stats["chars"],stats["chars_with_spaces"],stats["avg_wpl"],stats["avg_cpw"])
 
                 input("Press Enter to continue...")
 
