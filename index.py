@@ -430,6 +430,33 @@ def print_word_analysis(word_data,total_words):
     print("Longest word:", word_data["Longest word"])
     print("Shortest word:", word_data["Shortest word"])
 
+def case3_charts(total_words,stats):
+    labels = []
+    amount = []
+    percent = []
+    label = []
+
+    items = [(word, count) for count, word in stats ["word_counts"].items()]
+    items.sort(reverse=True)
+
+
+    for count, word in items[:10]:
+        amount.append(count)
+        labels.append(word)
+        percent.append(round(count / total_words * 100,2))
+
+    for i in range(len(labels)):
+        label.append(f"{labels[i]} ({percent[i]}%)")
+    
+    x_pos = [0,1,2,3,4,5,6,7,8,9]
+    plt.bar(labels, amount, label=label)
+    plt.xticks(x_pos) 
+    plt.title('Top 10 words')
+    plt.xlabel('The words')
+    plt.ylabel('Amount of time in text')
+    plt.legend()
+    plt.show()
+
 #Case 4
 
 def print_sentence_analysis(data):
@@ -538,9 +565,17 @@ def main():
                 input("Press Enter to continue...")
 
             case 3:
+
                 word_data = word_analysis(stats)
+
                 print_word_analysis(word_data,stats["words"])
+
                 results = save_section(results,filename,"Word analysis",word_data)
+
+                input("Press Enter to open graph...")
+
+                case3_charts(stats["words"],stats)
+
                 input("Press Enter to continue...")
             case 4:
                 sentence_data = sentence_analysis(stats)
