@@ -388,7 +388,7 @@ def base_stats_graph(filename, lines, words, characters,characters_with_spaces,a
     #Gör min vänsta och högra graf. väljer färg.
     right.bar(["Words per line", "Characters per word"], [avg_wpl, avg_cpw],
           color=["gold", "plum"])
-    left.bar(["Lines", "Words", "Characters", "Characters with spaces"], [lines, words, characters, characters_with_spaces],
+    left.bar(["Lines", "Words", "Characters", "Characters and spaces"], [lines, words, characters, characters_with_spaces],
          color=["skyblue", "lightgreen", "lightcoral", "purple"])
 
     plt.tight_layout()
@@ -435,8 +435,9 @@ def case3_charts(total_words,stats):
     amount = []
     percent = []
     label = []
+    colors = ['limegreen','darkorange','lightcoral','peachpuff','darkseagreen','palevioletred','firebrick','dimgrey','darkblue','indigo']
 
-    items = [(word, count) for count, word in stats ["word_counts"].items()]
+    items = [(count, word) for word, count in stats["word_counts"].items()]
     items.sort(reverse=True)
 
 
@@ -448,9 +449,8 @@ def case3_charts(total_words,stats):
     for i in range(len(labels)):
         label.append(f"{labels[i]} ({percent[i]}%)")
     
-    x_pos = [0,1,2,3,4,5,6,7,8,9]
-    plt.bar(labels, amount, label=label)
-    plt.xticks(x_pos) 
+    
+    plt.bar(labels, amount, label=label, color=colors)
     plt.title('Top 10 words')
     plt.xlabel('The words')
     plt.ylabel('Amount of time in text')
@@ -487,7 +487,7 @@ def case4_chart(data):
    
 
 
-    plt.pie(senlen, labels=intervals, autopct='%10.0f%%', shadow=True, explode=explode, startangle=180, colors=colors)
+    plt.pie(senlen, labels=intervals, autopct='%.1f%%', shadow=True, explode=explode, startangle=180, colors=colors)
     plt.title("Sentence length distribution (words)")
     plt.show()
 
@@ -522,9 +522,37 @@ def print_Character_analysis(char_analysis):
     print(f"Other:       {char_analysis["Other"]:<8} ({char_analysis["Other"] / char_analysis["Total characters"] * 100:.1f}%)")
     print("Other characters found:", char_analysis["Other"])    
 
-    for place,(count,char) in enumerate(char_analysis["Top_10"], start=1):
+    for place,(count,char) in enumerate(char_analysis["top_10"], start=1):
         percent = count / char_analysis["Total characters"] * 100
         print(f"{place:>2}. {char:<12} {count:>7,} times ({percent:>4.1f}%)")
+
+def case5_charts(char_analysis,filename):
+    #delar upp grafen i två delar så att man kan se de olika värdena
+    fig, (left, right) = plt.subplots(1, 2, figsize=(12, 5))
+    fig.suptitle("Case 5 charts:" + filename, fontweight="bold")    
+    
+
+    rightlabels = ["Letters", "Digits", "Spaces", "Punctuation", "Other"]
+    rightvalues = [char_analysis[i] for i in rightlabels]
+
+    colors = ['limegreen','darkorange','lightcoral','peachpuff','darkseagreen','palevioletred','firebrick','dimgrey','darkblue','indigo']
+
+    top10 = char_analysis["top_10"]
+    leftlabels = [char for count, char in top10]
+    leftvalues = [count for count, char in top10]
+
+    #Gör min vänsta och högra graf. väljer färg.
+    right.pie(rightvalues, labels=rightlabels, colors=colors[:5], autopct='%.1f%%', shadow=True)
+    right.set_title("Character types")
+
+    left.bar(leftlabels, leftvalues, color=colors)
+    left.set_title("Top 10 letters")
+    left.set_ylabel("Count")
+
+    plt.tight_layout()
+    plt.show()
+    
+
 
 
 def main():
@@ -598,18 +626,14 @@ def main():
 
                 input("Press Enter to continue...")
             case 4:
-                sentence_data = sentence_analysis(stats)
-                if sentence_data is None:
-                    print("No sentences found.")
-                else:
+                    sentence_data = sentence_analysis(stats)
                     print_sentence_analysis(sentence_data)
                     results = save_section(results, filename, "Sentence analysis", sentence_data)
-                    
-                input("Press Enter to open graph...")
 
-                case4_chart(sentence_data)
+                    input("Press Enter to open graph...")
+                    case4_chart(sentence_data)
 
-                input("Press Enter to continue...")
+                    input("Press Enter to continue...")
             case 5:
                 #Går igenom all "character analysis" som behövs för att få rätt data
                 char_analysis = Character_analysis(stats)
@@ -617,6 +641,8 @@ def main():
                 print_Character_analysis(char_analysis)
                 #sparar ner all min data i min "results" variabel
                 results = save_section(results, filename, "Character analysis", char_analysis)
+
+                case5_charts(char_analysis,filename)
 
                 input("Press Enter to continue...")
 
