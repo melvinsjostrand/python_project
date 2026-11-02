@@ -1,0 +1,70 @@
+============================================================
+TEXT ANALYSIS RESULTS
+============================================================
+File analysed: Crime_and_Punishment.txt
+Analysis date: 2026-11-02 18:28:02
+
+BASIC STATISTICS
+------------------------------
+Lines: 22289
+Words: 203505
+Characters: 927377
+Characters with spaces: 1112740
+Average words per line: 9.1
+Average characters per word: 4.6
+LIX: 30.2
+LIX level: Easy
+LIX description: Suitable for a general audience with basic reading skills.
+WORD ANALYSIS
+------------------------------
+Unique words: 10394
+Word appearing only once: 4502
+Longest word: disproportionately
+Shortest word: a
+Top 10:
+ 1. the            7,807 times
+ 2. and            6,902 times
+ 3. to             5,267 times
+ 4. he             4,657 times
+ 5. a              4,564 times
+ 6. i              3,940 times
+ 7. of             3,807 times
+ 8. you            3,805 times
+ 9. in             3,188 times
+10. it             2,974 times
+SENTENCE ANALYSIS
+------------------------------
+Sentences: 16104
+Average words per sentence: 12.6
+Longest sentence: Nor has either Dounia or I breathed a word to him of the great hopes we have of his helping us to pay for your university studies; we have not spoken of it in the first place, because it will come to pass of itself, later on, and he will no doubt without wasting words offer to do it of himself, (as though he could refuse Dounia that) the more readily since you may by your own efforts become his right hand in the office, and receive this assistance not as a charity, but as a salary earned by your own work.
+Longest sentence (words): 102
+Shortest sentence: bridge.
+Shortest sentence (words): 1
+Length distribution:
+   1-5:   4614
+  6-10:   4351
+ 11-20:   4224
+ 21-30:   1763
+   31+:   1152
+CHARACTER ANALYSIS
+------------------------------
+Total characters: 1112740
+Letters: 874182
+Digits: 30
+Spaces: 185363
+Punctuation: 40938
+Other: 12227
+Top 10:
+ 1. e            103,206 times
+ 2. t             79,323 times
+ 3. a             73,031 times
+ 4. o             70,887 times
+ 5. n             62,118 times
+ 6. i             61,538 times
+ 7. h             55,497 times
+ 8. s             52,751 times
+ 9. r             47,324 times
+10. d             38,661 times
+============================================================
+End of Analysis Report
+============================================================

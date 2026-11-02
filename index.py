@@ -52,18 +52,16 @@ def file_reader(filename):
 
 
     file = open(filename, "r", encoding="utf-8")
-    inside_book = True
     #går igenom hela filen rad för rad
     for line in file:
+        #Kollar ifall boken börjar
         if "*** START OF" in line:
-            inside_book = True
             reset_stats(stats)
             current = ""
             continue
+        #kollar ifall boken är slut
         if "*** END OF" in line:
             break
-        if not inside_book:
-            continue
         #lägger ihop alla ord
         stats["words"] += words(line)
         #lägger ihop alla karaktärer med spaces jag hämtar
@@ -93,6 +91,9 @@ def file_reader(filename):
     stats["avg_cpw"] = stats["chars"] / stats["words"] if stats["words"] > 0 else 0
     return stats
 
+
+
+#Gör så att alla values i min stats är 0
 def reset_stats(stats):
     stats["lines"] = 0
     stats["words"] = 0
@@ -292,7 +293,6 @@ def export_txt(results,filename):
     name = filename.replace(".txt", "")
     #Hämtar pathen till mappen och sen får du namnet "Filnamn" + resultat
     path = os.path.join("results", f"{name}_results.txt")
-    print(results)
     file = open(path, "w", encoding="utf-8")
     #Delar upp så jag kan hantera mina "sections"
     for filename, sections in results.items():
