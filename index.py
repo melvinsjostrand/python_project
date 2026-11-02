@@ -6,7 +6,6 @@ from datetime import datetime
 #För att hämta alla mina txt filer som jag har nersparat
 def get_files():
     txt_files = []
-    print(os.getcwd())
     for name in os.listdir("."):
         if name.lower().endswith(".txt"):
             txt_files.append(name)
